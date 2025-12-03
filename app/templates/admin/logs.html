@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Logs - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Administración</a></li>
+        <li class="breadcrumb-item active">Logs</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-clipboard-list text-primary"></i>
+                Logs del Sistema
+            </h2>
+            <div>
+                <a href="{{ url_for('admin.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <button class="btn btn-outline-secondary" id="btn-refresh-logs">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="filter_level" class="form-label">Nivel</label>
+                        <select class="form-select" id="filter_level">
+                            <option value="all">Todos los niveles</option>
+                            <option value="INFO">INFO</option>
+                            <option value="WARNING">WARNING</option>
+                            <option value="ERROR">ERROR</option>
+                            <option value="DEBUG">DEBUG</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter_date" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="filter_date">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filter_search" class="form-label">Buscar</label>
+                        <input type="text" class="form-control" id="filter_search" placeholder="Buscar en logs...">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <button class="btn btn-primary w-100" id="btn-apply-filters">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list"></i>
+                    Registros de Actividad
+                    <span class="badge bg-primary">{{ logs|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if logs %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0" id="logs-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha/Hora</th>
+                                <th>Nivel</th>
+                                <th>Mensaje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr class="log-row" data-level="{{ log.nivel }}">
+                                <td class="text-nowrap">
+                                    <small>{{ log.fecha }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if log.nivel == 'ERROR' %}bg-danger
+                                        {% elif log.nivel == 'WARNING' %}bg-warning text-dark
+                                        {% elif log.nivel == 'INFO' %}bg-info
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ log.nivel }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>{{ log.mensaje }}</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                    <h5>No hay logs disponibles</h5>
+                    <p class="text-muted">No se encontraron registros de actividad.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Estadísticas de Logs -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center py-3">
+                        <h4>{{ logs|selectattr('nivel', 'equalto', 'INFO')|list|length }}</h4>
+                        <p class="mb-0">INFO</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body text-center py-3">
+                        <h4>{{ logs|selectattr('nivel', 'equalto', 'WARNING')|list|length }}</h4>
+                        <p class="mb-0">WARNING</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center py-3">
+                        <h4>{{ logs|selectattr('nivel', 'equalto', 'ERROR')|list|length }}</h4>
+                        <p class="mb-0">ERROR</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body text-center py-3">
+                        <h4>{{ logs|length }}</h4>
+                        <p class="mb-0">TOTAL</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtros de logs
+    document.getElementById('btn-apply-filters').addEventListener('click', function() {
+        const levelFilter = document.getElementById('filter_level').value;
+        const dateFilter = document.getElementById('filter_date').value;
+        const searchFilter = document.getElementById('filter_search').value.toLowerCase();
+        
+        document.querySelectorAll('.log-row').forEach(row => {
+            let show = true;
+            
+            // Filtrar por nivel
+            if (levelFilter !== 'all' && row.getAttribute('data-level') !== levelFilter) {
+                show = false;
+            }
+            
+            // Filtrar por búsqueda
+            if (searchFilter && !row.textContent.toLowerCase().includes(searchFilter)) {
+                show = false;
+            }
+            
+            // Filtrar por fecha (simplificado)
+            if (dateFilter) {
+                const rowDate = row.cells[0].textContent.trim().split(' ')[0];
+                if (rowDate !== dateFilter) {
+                    show = false;
+                }
+            }
+            
+            row.style.display = show ? '' : 'none';
+        });
+    });
+
+    // Actualizar logs
+    document.getElementById('btn-refresh-logs').addEventListener('click', function() {
+        const button = this;
+        const originalHtml = button.innerHTML;
+        
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        button.disabled = true;
+        
+        setTimeout(() => {
+            button.innerHTML = originalHtml;
+            button.disabled = false;
+            alert('Logs actualizados (simulación)');
+        }, 1000);
+    });
+
+    // Auto-actualizar cada 30 segundos (opcional)
+    // setInterval(() => {
+    //     document.getElementById('btn-refresh-logs').click();
+    // }, 30000);
+});
+</script>
+{% endblock %}

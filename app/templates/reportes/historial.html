@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Reportes - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('reportes.index') }}">Reportes</a></li>
+        <li class="breadcrumb-item active">Historial</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-history text-dark"></i>
+                Historial de Reportes
+            </h2>
+            <a href="{{ url_for('reportes.index') }}" class="btn btn-outline-primary text-light bg-cards">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-cards text-light">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list  "></i>
+                    Reportes Generados
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if reportes.items %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Título</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reporte in reportes.items %}
+                            <tr>
+                                <td class="text-nowrap">
+                                    <small>{{ reporte.fecha_generacion.strftime('%d/%m/%Y %H:%M') }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if reporte.tipo_reporte == 'INDIVIDUAL_RIESGO' %}bg-primary
+                                        {% else %}bg-success{% endif %}">
+                                        {{ reporte.tipo_reporte.replace('_', ' ') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong>{{ reporte.titulo }}</strong>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ reporte.descripcion }}</small>
+                                </td>
+                                <td>
+                                    {% if reporte.archivo_path %}
+                                    <a href="{{ url_for('reportes.descargar', reporte_id=reporte.id) }}" 
+                                       class="btn btn-sm btn-success">
+                                        <i class="fas fa-download"></i> PDF
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">No disponible</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h5>No hay reportes generados</h5>
+                    <p class="text-muted">Genere su primer reporte para verlo aquí.</p>
+                    <a href="{{ url_for('reportes.index') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Generar Reporte
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Paginación -->
+            {% if reportes.pages > 1 %}
+            <div class="card-footer">
+                <nav aria-label="Paginación">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% for page_num in reportes.iter_pages() %}
+                        {% if page_num %}
+                        <li class="page-item {% if page_num == reportes.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('reportes.historial', page=page_num) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Backup - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Administración</a></li>
+        <li class="breadcrumb-item active">Backup</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-database text-primary"></i>
+                Backup y Restauración
+            </h2>
+            <a href="{{ url_for('admin.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="row">
+            <!-- Backup de Datos -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-save"></i>
+                            Backup de Datos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Cree una copia de seguridad de todos los datos del sistema.
+                        </p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Información:</strong> El backup incluirá estudiantes, cursos, notas, asistencias y configuración.
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="backup_type" class="form-label">Tipo de Backup</label>
+                            <select class="form-select" id="backup_type">
+                                <option value="complete">Backup Completo</option>
+                                <option value="data_only">Solo Datos</option>
+                                <option value="config_only">Solo Configuración</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="backup_description" class="form-label">Descripción (Opcional)</label>
+                            <textarea class="form-control" id="backup_description" rows="2" 
+                                      placeholder="Descripción del backup..."></textarea>
+                        </div>
+
+                        <button class="btn btn-success w-100" id="btn-backup">
+                            <i class="fas fa-download"></i> Generar Backup
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Restauración -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-upload"></i>
+                            Restauración
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Restaure el sistema desde un archivo de backup anterior.
+                        </p>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Advertencia:</strong> Esta acción sobrescribirá los datos actuales.
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="backup_file" class="form-label">Seleccionar Archivo de Backup</label>
+                            <input type="file" class="form-control" id="backup_file" accept=".json,.sql,.backup">
+                            <div class="form-text">
+                                Formatos soportados: JSON, SQL
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="confirm_restore">
+                                <label class="form-check-label" for="confirm_restore">
+                                    Confirmo que entiendo que se perderán los datos actuales
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-warning w-100" id="btn-restore" disabled>
+                            <i class="fas fa-upload"></i> Restaurar Sistema
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial de Backups -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history"></i>
+                    Historial de Backups Recientes
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Tipo</th>
+                                <th>Tamaño</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">
+                                    <i class="fas fa-info-circle"></i>
+                                    No hay backups registrados
+                                </td>
+                            </tr>
+                            <!-- En un sistema real aquí se listarían los backups -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Sistema -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <i class="fas fa-hdd fa-2x text-primary mb-2"></i>
+                        <h6>Espacio en Disco</h6>
+                        <p class="mb-0">Disponible: 15.2 GB</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-alt fa-2x text-success mb-2"></i>
+                        <h6>Último Backup</h6>
+                        <p class="mb-0">No realizado</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <i class="fas fa-database fa-2x text-info mb-2"></i>
+                        <h6>Tamaño Base de Datos</h6>
+                        <p class="mb-0">~2.3 MB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Habilitar botón de restauración solo cuando esté confirmado
+    const confirmCheckbox = document.getElementById('confirm_restore');
+    const restoreButton = document.getElementById('btn-restore');
+    
+    confirmCheckbox.addEventListener('change', function() {
+        restoreButton.disabled = !this.checked;
+    });
+
+    // Simular backup (en un sistema real esto haría una llamada al servidor)
+    document.getElementById('btn-backup').addEventListener('click', function() {
+        if (confirm('¿Está seguro de generar un backup del sistema?')) {
+            // Simular proceso de backup
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+                alert('Backup generado exitosamente (simulación)');
+            }, 2000);
+        }
+    });
+
+    // Simular restauración
+    document.getElementById('btn-restore').addEventListener('click', function() {
+        const fileInput = document.getElementById('backup_file');
+        
+        if (!fileInput.files.length) {
+            alert('Por favor seleccione un archivo de backup');
+            return;
+        }
+        
+        if (confirm('¿ESTÁ SEGURO? Esta acción no se puede deshacer y perderá todos los datos actuales.')) {
+            // Simular proceso de restauración
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Restaurando...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+                alert('Sistema restaurado exitosamente (simulación)');
+            }, 3000);
+        }
+    });
+});
+</script>
+{% endblock %}

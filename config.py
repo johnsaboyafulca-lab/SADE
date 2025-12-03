@@ -11,7 +11,7 @@ class Config:
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = (
         f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT', 3306)}/{os.getenv('DB_NAME')}"
+        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT', '3306')}/{os.getenv('DB_NAME')}"
     )
     DEBUG = True
 
@@ -20,7 +20,7 @@ class ProductionConfig(Config):
     SECRET_KEY = os.getenv("PROD_SECRET_KEY", "fallback_prod_secret")
     SQLALCHEMY_DATABASE_URI = (
         f"mysql+pymysql://{os.getenv('PROD_DB_USER')}:{os.getenv('PROD_DB_PASSWORD')}"
-        f"@{os.getenv('PROD_DB_HOST')}:{os.getenv('PROD_DB_PORT', 3306)}/{os.getenv('PROD_DB_DATABASE')}"
+        f"@{os.getenv('PROD_DB_HOST')}:{os.getenv('PROD_DB_PORT', '3306')}/{os.getenv('PROD_DB_NAME')}"
     )
     DEBUG = False
 

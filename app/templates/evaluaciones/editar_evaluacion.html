@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Evaluación - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('evaluaciones.index') }}">Evaluaciones</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('evaluaciones.detalle_evaluacion', evaluacion_id=evaluacion.id) }}">{{ evaluacion.nombre_evaluacion }}</a></li>
+        <li class="breadcrumb-item active">Editar</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-edit text-primary"></i>
+                Editar Evaluación
+            </h2>
+            <a href="{{ url_for('evaluaciones.detalle_evaluacion', evaluacion_id=evaluacion.id) }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver al detalle
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-edit"></i>
+                    Editar Información de la Evaluación
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('evaluaciones.editar_evaluacion', evaluacion_id=evaluacion.id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.curso_id.label(class="form-label") }}
+                                {{ form.curso_id(class="form-select") }}
+                                {% if form.curso_id.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.curso_id.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.tipo_evaluacion.label(class="form-label") }}
+                                {{ form.tipo_evaluacion(class="form-select") }}
+                                {% if form.tipo_evaluacion.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.tipo_evaluacion.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                {{ form.nombre_evaluacion.label(class="form-label") }}
+                                {{ form.nombre_evaluacion(class="form-control") }}
+                                {% if form.nombre_evaluacion.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.nombre_evaluacion.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form.peso.label(class="form-label") }}
+                                {{ form.peso(class="form-control", type="number", step="0.1", min="0", max="100") }}
+                                {% if form.peso.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.peso.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.fecha_creacion.label(class="form-label") }}
+                                {{ form.fecha_creacion(class="form-control", type="date") }}
+                                {% if form.fecha_creacion.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.fecha_creacion.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('evaluaciones.detalle_evaluacion', evaluacion_id=evaluacion.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <div>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Actualizar Evaluación
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

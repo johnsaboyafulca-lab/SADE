@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Reportes</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                
+                Sistema de Reportes
+            </h2>
+        </div>
+
+        <!-- Tarjetas de Tipos de Reporte -->
+        <div class="row">
+            <!-- Reporte Individual -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-header bg-azul text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-graduate"></i>
+                            Reporte Individual
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Genera reportes detallados para estudiantes específicos, incluyendo:
+                        </p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Información personal</li>
+                            <li><i class="fas fa-check text-success"></i> Categoría de riesgo</li>
+                            <li><i class="fas fa-check text-success"></i> Rendimiento por curso</li>
+                            <li><i class="fas fa-check text-success"></i> Asistencias y notas</li>
+                            <li><i class="fas fa-check text-success"></i> Recomendaciones</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('reportes.individual') }}" class="btn btn-primary w-100 bg-azul">
+                            <i class="fas fa-file-alt"></i> Generar Reporte Individual
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reporte General -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-success">
+                    <div class="card-header bg-cards text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-users"></i>
+                            Reporte General
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Reporte consolidado de todos los estudiantes en riesgo académico:
+                        </p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Estadísticas generales</li>
+                            <li><i class="fas fa-check text-success"></i> Listado por categoría</li>
+                            <li><i class="fas fa-check text-success"></i> Análisis por semestre</li>
+                            <li><i class="fas fa-check text-success"></i> Distribución de riesgo</li>
+                            <li><i class="fas fa-check text-success"></i> Tendencias académicas</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('reportes.general') }}" class="btn btn-primary w-100 bg-cards">
+                            <i class="fas fa-chart-bar"></i> Generar Reporte General
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acceso Rápido al Historial -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-cards2 text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-history"></i>
+                            Historial de Reportes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Acceda a los reportes generados anteriormente y descárguelos cuando lo necesite.
+                        </p>
+                        <a href="{{ url_for('reportes.historial') }}" class="btn btn-primary bg-cards2">
+                            <i class="fas fa-folder-open"></i> Ver Historial Completo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

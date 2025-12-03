@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Nota - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('evaluaciones.notas_index') }}">Notas</a></li>
+        <li class="breadcrumb-item active">Editar Nota</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-edit text-dark"></i>
+                Editar Nota
+            </h2>
+            <a href="{{ url_for('evaluaciones.notas_index') }}" class="btn btn-outline-primary text-light bg-cards">
+                <i class="fas fa-arrow-left"></i> Volver a la lista
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-cards2 text-light">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-edit"></i>
+                    Editar Información de la Nota
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('evaluaciones.editar_nota', nota_id=nota.id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.inscripcion_id.label(class="form-label") }}
+                                {{ form.inscripcion_id(class="form-select") }}
+                                {% if form.inscripcion_id.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.inscripcion_id.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.evaluacion_id.label(class="form-label") }}
+                                {{ form.evaluacion_id(class="form-select") }}
+                                {% if form.evaluacion_id.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.evaluacion_id.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form.nota.label(class="form-label") }}
+                                {{ form.nota(class="form-control", type="number", step="0.1", min="0", max="20") }}
+                                {% if form.nota.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.nota.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form.fecha_registro.label(class="form-label") }}
+                                {{ form.fecha_registro(class="form-control", type="date") }}
+                                {% if form.fecha_registro.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.fecha_registro.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.observaciones.label(class="form-label") }}
+                        {{ form.observaciones(class="form-control", rows="3") }}
+                        {% if form.observaciones.errors %}
+                            <div class="text-danger">
+                                {% for error in form.observaciones.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('evaluaciones.notas_index') }}" class="btn btn-secondary bg-cards2">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <div>
+                            <button type="submit" class="btn btn-primary bg-cards">
+                                <i class="fas fa-save"></i> Actualizar Nota
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

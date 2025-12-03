@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle del Estudiante - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+   
+
+        <div class="row">
+            <!-- Información del Estudiante -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-graduate"></i>
+                            Información del Estudiante
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Código:</div>
+                            <div class="col-sm-8">{{ estudiante.codigo_estudiante }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Nombres:</div>
+                            <div class="col-sm-8">{{ estudiante.nombres }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Apellidos:</div>
+                            <div class="col-sm-8">{{ estudiante.apellidos }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Email:</div>
+                            <div class="col-sm-8">{{ estudiante.email }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Teléfono:</div>
+                            <div class="col-sm-8">{{ estudiante.telefono or 'No registrado' }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Fecha Inscripción:</div>
+                            <div class="col-sm-8">{{ estudiante.fecha_inscripcion.strftime('%d/%m/%Y') }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 fw-bold">Estado:</div>
+                            <div class="col-sm-8">
+                                {% if estudiante.activo %}
+                                <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial de Riesgo -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-line"></i>
+                            Seguimiento de Riesgo Académico
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if seguimientos %}
+                            {% for seguimiento in seguimientos %}
+                            <div class="border-start border-4 
+                                {% if seguimiento.categoria_riesgo == 'ALERTA_ROJA' %}border-danger
+                                {% elif seguimiento.categoria_riesgo == 'ALERTA_AMARILLA' %}border-warning
+                                {% else %}border-success{% endif %} 
+                                ps-3 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1">
+                                        Semestre {{ seguimiento.semestre }}
+                                    </h6>
+                                    <span class="badge 
+                                        {% if seguimiento.categoria_riesgo == 'ALERTA_ROJA' %}bg-danger
+                                        {% elif seguimiento.categoria_riesgo == 'ALERTA_AMARILLA' %}bg-warning
+                                        {% else %}bg-success{% endif %}">
+                                        {{ seguimiento.categoria_riesgo.replace('_', ' ') }}
+                                    </span>
+                                </div>
+                                <p class="mb-1 small">
+                                    <strong>Puntaje:</strong> {{ "%.2f"|format(seguimiento.puntaje_riesgo) }}
+                                </p>
+                                <p class="mb-1 small text-muted">
+                                    <strong>Evaluación:</strong> {{ seguimiento.fecha_evaluacion.strftime('%d/%m/%Y') }}
+                                </p>
+                                {% if seguimiento.observaciones %}
+                                <p class="mb-0 small">
+                                    <strong>Observaciones:</strong> {{ seguimiento.observaciones }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-info-circle fa-2x mb-2"></i>
+                                <p>No hay registros de seguimiento para este estudiante</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('estudiantes.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a la lista
+                    </a>
+                     <!-- BOTONES NUEVOS: Editar y Eliminar -->
+            <a href="{{ url_for('estudiantes.editar', estudiante_id=estudiante.id) }}" 
+               class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar Estudiante
+            </a>
+            <form method="POST" action="{{ url_for('estudiantes.eliminar', estudiante_id=estudiante.id) }}" 
+                  class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar este estudiante?');">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar Estudiante
+                </button>
+            </form>
+                    <a href="{{ url_for('estudiantes.en_riesgo') }}" class="btn btn-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Ver todos en riesgo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

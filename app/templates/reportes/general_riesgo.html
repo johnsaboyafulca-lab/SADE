@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte General de Riesgo Académico</title>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .container { width: 100% !important; }
+            .card { border: none !important; box-shadow: none !important; }
+        }
+        
+        body { font-family: 'Arial', sans-serif; line-height: 1.6; }
+        .header { border-bottom: 3px solid #2c3e50; padding-bottom: 20px; margin-bottom: 30px; }
+        .logo { max-width: 150px; }
+        .institucion { color: #2c3e50; font-weight: bold; }
+        .badge-riesgo { font-size: 1.1em; padding: 8px 15px; }
+        .table-condensed td, .table-condensed th { padding: 8px; }
+        .estadisticas-card { margin-bottom: 20px; }
+        .resumen-estadisticas { background-color: #f8f9fa; padding: 20px; border-radius: 5px; }
+        
+        .firmas-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 80px;
+            page-break-inside: avoid;
+        }
+        .firma {
+            text-align: center;
+            width: 45%;
+        }
+        .firma-linea {
+            border-top: 1px solid #000;
+            margin: 50px 0 10px 0;
+            width: 100%;
+        }
+        .firma-texto {
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="header text-center">
+            <table width="100%">
+                <tr>
+                    <td width="20%">
+                        <img src="{{ url_for('static', filename='img/logo_see_f.png', _external=True) }}" 
+                             alt="Logo" class="logo" style="max-width: 120px;">
+                    </td>
+                    <td width="60%" class="text-center">
+                        <h2 class="institucion">Sistema de Seguimiento Estudiantil</h2>
+                        <h4>Reporte General de Riesgo Académico</h4>
+                        <p class="text-muted">Generado el: {{ fecha_generacion }}</p>
+                    </td>
+                    <td width="20%" class="text-end">
+                        <small>Semestre: {{ semestre }}</small>
+                        {% if categoria_filtro != 'TODOS' %}
+                        <br><small>Filtro: {{ categoria_filtro.replace('_', ' ') }}</small>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Resumen Estadístico -->
+        <div class="resumen-estadisticas mb-4">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <div class="estadisticas-card">
+                        <h3 class="text-primary">{{ estadisticas.total_estudiantes }}</h3>
+                        <p class="text-muted">Total Estudiantes</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="estadisticas-card">
+                        <h3 class="text-warning">{{ estadisticas.total_riesgo }}</h3>
+                        <p class="text-muted">En Riesgo</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="estadisticas-card">
+                        <h3 class="text-success">{{ "%.1f"|format(estadisticas.porcentaje_riesgo) }}%</h3>
+                        <p class="text-muted">Porcentaje en Riesgo</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="estadisticas-card">
+                        <h3 class="text-info">{{ estadisticas.total_estudiantes - estadisticas.total_riesgo }}</h3>
+                        <p class="text-muted">Sin Riesgo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distribución por Categorías -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie"></i>
+                    Distribución por Categorías de Riesgo
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <div class="mb-3">
+                            <span class="badge bg-success badge-riesgo">SIN RIESGO</span>
+                            <h4 class="mt-2">{{ estadisticas.categorias.get('SIN_RIESGO', 0) }}</h4>
+                            <p class="text-muted">Estudiantes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="mb-3">
+                            <span class="badge bg-warning text-dark badge-riesgo">ALERTA AMARILLA</span>
+                            <h4 class="mt-2">{{ estadisticas.categorias.get('ALERTA_AMARILLA', 0) }}</h4>
+                            <p class="text-muted">Estudiantes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="mb-3">
+                            <span class="badge bg-danger badge-riesgo">ALERTA ROJA</span>
+                            <h4 class="mt-2">{{ estadisticas.categorias.get('ALERTA_ROJA', 0) }}</h4>
+                            <p class="text-muted">Estudiantes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listado de Estudiantes -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list"></i>
+                    Listado de Estudiantes en Riesgo Académico
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if estudiantes_riesgo %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-condensed">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Código</th>
+                                <th>Estudiante</th>
+                                <th>Categoría</th>
+                                <th>Puntaje</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for estudiante, seguimiento in estudiantes_riesgo %}
+                            <tr>
+                                <td><strong>{{ estudiante.codigo_estudiante }}</strong></td>
+                                <td>{{ estudiante.nombres }} {{ estudiante.apellidos }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if seguimiento.categoria_riesgo == 'ALERTA_ROJA' %}bg-danger
+                                        {% elif seguimiento.categoria_riesgo == 'ALERTA_AMARILLA' %}bg-warning text-dark
+                                        {% else %}bg-success{% endif %}">
+                                        {{ seguimiento.categoria_riesgo.replace('_', ' ') }}
+                                    </span>
+                                </td>
+                                <td><strong>{{ "%.2f"|format(seguimiento.puntaje_riesgo) }}</strong></td>
+                                <td>{{ estudiante.email }}</td>
+                                <td>{{ estudiante.telefono or 'No registrado' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-success text-center">
+                    <i class="fas fa-check-circle fa-2x mb-3"></i>
+                    <h5>¡Excelentes noticias!</h5>
+                    <p class="mb-0">No hay estudiantes en riesgo académico con los filtros seleccionados.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Análisis y Recomendaciones -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line"></i>
+                    Análisis y Recomendaciones Institucionales
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Análisis de la Situación:</h6>
+                        <ul>
+                            {% if estadisticas.total_riesgo > 0 %}
+                                <li>El {{ "%.1f"|format(estadisticas.porcentaje_riesgo) }}% de los estudiantes requieren atención académica</li>
+                                {% if estadisticas.categorias.get('ALERTA_ROJA', 0) > 0 %}
+                                <li>Existen {{ estadisticas.categorias.get('ALERTA_ROJA', 0) }} estudiantes en situación crítica que requieren intervención inmediata</li>
+                                {% endif %}
+                                {% if estadisticas.categorias.get('ALERTA_AMARILLA', 0) > 0 %}
+                                <li>{{ estadisticas.categorias.get('ALERTA_AMARILLA', 0) }} estudiantes presentan riesgo moderado y necesitan seguimiento</li>
+                                {% endif %}
+                            {% else %}
+                                <li>La situación académica general es favorable</li>
+                                <li>No se detectaron estudiantes en riesgo con los criterios actuales</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Recomendaciones:</h6>
+                        <ul>
+                            {% if estadisticas.categorias.get('ALERTA_ROJA', 0) > 0 %}
+                            <li><strong>Prioridad 1:</strong> Intervención inmediata para estudiantes en alerta roja</li>
+                            <li><strong>Prioridad 2:</strong> Seguimiento quincenal para alerta amarilla</li>
+                            {% elif estadisticas.categorias.get('ALERTA_AMARILLA', 0) > 0 %}
+                            <li><strong>Acción:</strong> Implementar plan de seguimiento para estudiantes en alerta amarilla</li>
+                            <li><strong>Prevención:</strong> Reforzar estrategias de apoyo académico</li>
+                            {% else %}
+                            <li><strong>Mantenimiento:</strong> Continuar con las estrategias de apoyo actuales</li>
+                            <li><strong>Prevención:</strong> Monitoreo proactivo para detectar cambios tempranos</li>
+                            {% endif %}
+                            <li><strong>General:</strong> Revisar periódicamente los umbrales de riesgo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Reporte -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-info-circle"></i>
+                    Información del Reporte
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Semestre analizado:</strong> {{ semestre }}</p>
+                        <p><strong>Fecha de generación:</strong> {{ fecha_generacion }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Total de estudiantes analizados:</strong> {{ estadisticas.total_estudiantes }}</p>
+                        <p><strong>Criterios de evaluación:</strong> Rendimiento, Asistencia, Distribución de riesgo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Firmas -->
+        <div class="firmas-container">
+            <div class="firma">
+                <div class="firma-linea"></div>
+                <div class="firma-texto">Coordinador Académico</div>
+                <div class="firma-texto">Nombre y Firma</div>
+            </div>
+            <div class="firma">
+                <div class="firma-linea"></div>
+                <div class="firma-texto">Director de Programa</div>
+                <div class="firma-texto">Nombre y Firma</div>
+            </div>
+        </div>
+
+        <!-- Pie -->
+        <div class="text-center mt-4 no-print">
+            <small class="text-muted">
+                Reporte generado por el Sistema de Seguimiento Estudiantil - {{ fecha_generacion }}
+            </small>
+            <br>
+            <button onclick="window.print()" class="btn btn-primary btn-sm mt-2">
+                <i class="fas fa-print"></i> Imprimir Reporte
+            </button>
+        </div>
+    </div>
+</body>
+</html>

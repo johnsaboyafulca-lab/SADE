@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Estadísticas de Asistencias - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+
+<link rel="stylesheet" href="{{url_for('static', filename='seguimiento/seguimiento.css')}}">
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('asistencias.index') }}">Asistencias</a></li>
+        <li class="breadcrumb-item active">Estadísticas</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-chart-bar text-dark"></i>
+                Estadísticas de Asistencias
+            </h2>
+            <a href="{{ url_for('asistencias.index') }}" class="btn btn-outline-primary text-light bg-cards">
+                <i class="fas fa-arrow-left"></i> Volver a Asistencias
+            </a>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-header text-light bg-cards">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-filter"></i>
+                    Filtros
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('asistencias.estadisticas') }}">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="curso_id" class="form-label">Curso</label>
+                                <select class="form-select" id="curso_id" name="curso_id">
+                                    <option value="">Todos los cursos</option>
+                                    {% for curso in cursos %}
+                                    <option value="{{ curso.id }}" {% if curso_id == curso.id %}selected{% endif %}>
+                                        {{ curso.codigo_curso }} - {{ curso.nombre_curso }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="estudiante_id" class="form-label">Estudiante</label>
+                                <select class="form-select" id="estudiante_id" name="estudiante_id">
+                                    <option value="">Todos los estudiantes</option>
+                                    {% for estudiante in estudiantes %}
+                                    <option value="{{ estudiante.id }}" {% if estudiante_id == estudiante.id %}selected{% endif %}>
+                                        {{ estudiante.codigo_estudiante }} - {{ estudiante.nombres }} {{ estudiante.apellidos }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="semestre" class="form-label">Semestre</label>
+                                <select class="form-select" id="semestre" name="semestre">
+                                    <option value="">Todos los semestres</option>
+                                    {% for sem in semestres %}
+                                    <option value="{{ sem[0] }}" {% if semestre == sem[0] %}selected{% endif %}>
+                                        {{ sem[0] }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary text-light bg-cards">
+                            <i class="fas fa-filter"></i> Aplicar Filtros
+                        </button>
+                        <a href="{{ url_for('asistencias.estadisticas') }}" class="btn btn-outline-secondary text-light bg-cards2">
+                            <i class="fas fa-times"></i> Limpiar Filtros
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="card">
+            <div class="card-header text-light bg-cards">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-table"></i>
+                    Resumen de Asistencias
+                    <span class="badge bg-cards2">{{ estadisticas|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if estadisticas %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Curso</th>
+                                <th class="text-center">Total Clases</th>
+                                <th class="text-center">Asistencias</th>
+                                <th class="text-center">Justificadas</th>
+                                <th class="text-center">% Asistencia</th>
+                                <th class="text-center">% Efectiva</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in estadisticas %}
+                            <tr>
+                                <td>
+                                    <strong>{{ stat.estudiante }}</strong>
+                                </td>
+                                <td>{{ stat.curso }}</td>
+                                <td class="text-center">{{ stat.total_clases }}</td>
+                                <td class="text-center">{{ stat.asistencias }}</td>
+                                <td class="text-center">{{ stat.justificadas }}</td>
+                                <td class="text-center">
+                                    <span class="badge 
+                                        {% if stat.porcentaje_asistencia >= 80 %}bg-success
+                                        {% elif stat.porcentaje_asistencia >= 60 %}bg-warning
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ "%.1f"|format(stat.porcentaje_asistencia) }}%
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge 
+                                        {% if stat.porcentaje_efectiva >= 80 %}bg-success
+                                        {% elif stat.porcentaje_efectiva >= 60 %}bg-warning
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ "%.1f"|format(stat.porcentaje_efectiva) }}%
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if stat.porcentaje_efectiva >= 80 %}
+                                    <span class="badge bg-success">Excelente</span>
+                                    {% elif stat.porcentaje_efectiva >= 70 %}
+                                    <span class="badge bg-primary">Adecuado</span>
+                                    {% elif stat.porcentaje_efectiva >= 60 %}
+                                    <span class="badge bg-warning">En Riesgo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Crítico</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                    <h5>No hay datos de asistencias</h5>
+                    <p class="text-muted">
+                        {% if curso_id or estudiante_id or semestre %}
+                        No hay resultados con los filtros aplicados
+                        {% else %}
+                        No hay registros de asistencia para generar estadísticas
+                        {% endif %}
+                    </p>
+                    <a href="{{ url_for('asistencias.crear') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Registrar Asistencias
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Resumen General -->
+        {% if estadisticas %}
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card bg-primary2 text-white">
+                    <div class="card-body text-center">
+                        <h3>{{ estadisticas|length }}</h3>
+                        <p class="mb-0">Estudiantes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-verde text-dark">
+                    <div class="card-body text-center">
+                        <h3>{{ "%.1f"|format(estadisticas|map(attribute='porcentaje_asistencia')|sum / estadisticas|length) }}%</h3>
+                        <p class="mb-0">Promedio Asistencia</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-ama text-dark">
+                    <div class="card-body text-center">
+                        <h3>{{ "%.1f"|format(estadisticas|map(attribute='porcentaje_efectiva')|sum / estadisticas|length) }}%</h3>
+                        <p class="mb-0">Promedio Efectiva</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-rojo text-dark">
+                    <div class="card-body text-center">
+                        <h3>{{ estadisticas|selectattr('porcentaje_efectiva', 'lt', 70)|list|length }}</h3>
+                        <p class="mb-0">En Riesgo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

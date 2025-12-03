@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Asistencia #{{ asistencia.id }} - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('asistencias.index') }}">Asistencias</a></li>
+        <li class="breadcrumb-item active">Asistencia #{{ asistencia.id }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-calendar-check text-primary"></i>
+                Detalle de Asistencia
+            </h2>
+            <div>
+                <a href="{{ url_for('asistencias.editar', asistencia_id=asistencia.id) }}" class="btn btn-warning me-2">
+                    <i class="fas fa-edit"></i> Editar Asistencia
+                </a>
+                <form method="POST" action="{{ url_for('asistencias.eliminar', asistencia_id=asistencia.id) }}" 
+                      class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar este registro de asistencia?');">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar Asistencia
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Información de la Asistencia -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle"></i>
+                            Información de la Asistencia
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Estudiante:</div>
+                            <div class="col-sm-8">
+                                <a href="{{ url_for('estudiantes.detalle', estudiante_id=asistencia.inscripcion.estudiante.id) }}">
+                                    {{ asistencia.inscripcion.estudiante.nombres }} {{ asistencia.inscripcion.estudiante.apellidos }}
+                                </a><br>
+                                <small class="text-muted">{{ asistencia.inscripcion.estudiante.codigo_estudiante }}</small>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Curso:</div>
+                            <div class="col-sm-8">
+                                <a href="{{ url_for('cursos.detalle', curso_id=asistencia.inscripcion.curso.id) }}">
+                                    {{ asistencia.inscripcion.curso.nombre_curso }}
+                                </a><br>
+                                <small class="text-muted">{{ asistencia.inscripcion.curso.codigo_curso }} - {{ asistencia.inscripcion.curso.semestre }}</small>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Fecha:</div>
+                            <div class="col-sm-8">{{ asistencia.fecha.strftime('%d/%m/%Y') }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Asistencia:</div>
+                            <div class="col-sm-8">
+                                {% if asistencia.presente %}
+                                <span class="badge bg-success">Presente</span>
+                                {% else %}
+                                <span class="badge bg-danger">Ausente</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Justificado:</div>
+                            <div class="col-sm-8">
+                                {% if asistencia.justificado %}
+                                <span class="badge bg-warning text-dark">Sí</span>
+                                {% else %}
+                                <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if asistencia.observaciones %}
+                        <div class="row">
+                            <div class="col-sm-4 fw-bold">Observaciones:</div>
+                            <div class="col-sm-8">{{ asistencia.observaciones }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('asistencias.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a la lista
+                    </a>
+                    <a href="{{ url_for('asistencias.crear') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nueva Asistencia
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

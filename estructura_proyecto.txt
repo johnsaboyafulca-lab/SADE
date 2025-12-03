@@ -1,0 +1,95 @@
+.
+|-- README.md
+|-- __pycache__
+|   |                               `-- config.cpython-311.pyc
+|   |                               `-- config.cpython-312.pyc
+|   |                               `-- config.cpython-313.pyc
+|                                   `-- run.cpython-313.pyc
+|-- amarillo.py
+|-- app
+|   |                               `-- __init__.py
+|   |                               `-- __pycache__
+|   |   |                           `-- __init__.cpython-311.pyc
+|   |   |                           `-- __init__.cpython-312.pyc
+|   |   |                           `-- __init__.cpython-313.pyc
+|   |   |                           `-- extensions.cpython-311.pyc
+|   |   |                           `-- extensions.cpython-312.pyc
+|   |   |                           `-- extensions.cpython-313.pyc
+|   |   |                           `-- models.cpython-311.pyc
+|   |   |                           `-- models.cpython-312.pyc
+|   |                               `-- models.cpython-313.pyc
+|   |-- config_sistema.json
+|   |-- extensions.py
+|   |-- models.py
+|   |-- modules
+|   |   |                           `-- admin
+|   |   |                           `-- asistencias
+|   |   |                           `-- auth
+|   |   |                           `-- cursos
+|   |   |                           `-- dashboard
+|   |   |                           `-- estudiantes
+|   |   |                           `-- evaluaciones
+|   |   |                           `-- importacion
+|   |   |                           `-- inscripciones
+|   |   |                           `-- main
+|   |   |                           `-- reportes
+|   |                               `-- seguimiento
+|   |-- services
+|   |   |                           `-- __pycache__
+|   |   |                           `-- report_generator.py
+|   |   |                           `-- riesgo_calculator.py
+|   |                               `-- riesgo_calculator_v2.py
+|   |-- static
+|   |   |                           `-- auth
+|   |   |                           `-- base
+|   |   |                           `-- bootstrap
+|   |   |                           `-- dashboard
+|   |   |                           `-- img
+|   |   |                           `-- reports
+|   |                               `-- seguimiento
+|   `-- templates
+|       |                           `-- admin
+|       |                           `-- asistencias
+|       |                           `-- auth
+|       |                           `-- base.html
+|       |                           `-- cursos
+|       |                           `-- dashboard
+|       |                           `-- estudiantes
+|       |                           `-- evaluaciones
+|       |                           `-- importacion
+|       |                           `-- inscripciones
+|       |                           `-- reportes
+|                                   `-- seguimiento
+|-- config.py
+|-- config_sistema.json
+|-- crear_usuarios.py
+|-- directorio_completo.py
+|-- estructura_proyecto.txt
+|-- requirements.txt
+|-- rojo.py
+|-- run.py
+|-- venv
+|   |-- Include
+|   |    -- site
+|   |-- Lib
+|   |    -- site-packages
+|   |-- Scripts
+|   |   |      -- Activate.ps1
+|   |   |      -- activate
+|   |   |      -- activate.bat
+|   |   |      -- alembic.exe
+|   |   |      -- deactivate.bat
+|   |   |      -- dotenv.exe
+|   |   |      -- email_validator.exe
+|   |   |      -- f2py.exe
+|   |   |      -- flask.exe
+|   |   |      -- mako-render.exe
+|   |   |      -- numpy-config.exe
+|   |   |      -- pip.exe
+|   |   |      -- pip3.12.exe
+|   |   |      -- pip3.exe
+|   |   |      -- python.exe
+|   |   |      -- pythonw.exe
+|   |          -- virtualenv.exe
+|   `-- pyvenv.cfg
+`-- verde.py

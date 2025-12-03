@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios - Sistema de Seguimiento{% endblock %}
+
+
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Administración</a></li>
+        <li class="breadcrumb-item active">Usuarios</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-users-cog text-primary"></i>
+        Gestión de Usuarios
+    </h2>
+    <div>
+        <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
+            <i class="fas fa-plus"></i> Crear Usuario
+        </button>
+        <a href="{{ url_for('admin.index') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+        <!-- Tabla de Usuarios -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list"></i>
+                    Lista de Usuarios del Sistema
+                    <span class="badge bg-primary">{{ usuarios|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if usuarios %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usuario in usuarios %}
+                            <tr>
+                                <td>
+                                    <strong>{{ usuario.username }}</strong>
+                                    {% if usuario.id == current_user.id %}
+                                    <span class="badge bg-info">Tú</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ usuario.email }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if usuario.rol == 'administrador' %}bg-danger
+                                        {% elif usuario.rol == 'coordinador' %}bg-warning text-dark
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ usuario.rol }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if usuario.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ usuario.fecha_creacion.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <!-- Cambiar Rol -->
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" 
+                                                    type="button" data-bs-toggle="dropdown"
+                                                    {% if usuario.id == current_user.id %}disabled{% endif %}>
+                                                <i class="fas fa-user-tag"></i> Rol
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item cambiar-rol" 
+                                                       data-usuario-id="{{ usuario.id }}" 
+                                                       data-rol="administrador">
+                                                        <i class="fas fa-crown text-danger"></i> Administrador
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item cambiar-rol" 
+                                                       data-usuario-id="{{ usuario.id }}" 
+                                                       data-rol="coordinador">
+                                                        <i class="fas fa-user-shield text-warning"></i> Coordinador
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item cambiar-rol" 
+                                                       data-usuario-id="{{ usuario.id }}" 
+                                                       data-rol="docente">
+                                                        <i class="fas fa-chalkboard-teacher text-secondary"></i> Docente
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Activar/Desactivar -->
+                                        <button class="btn btn-sm {% if usuario.activo %}btn-outline-warning{% else %}btn-outline-success{% endif %} toggle-usuario"
+                                                data-usuario-id="{{ usuario.id }}"
+                                                {% if usuario.id == current_user.id %}disabled{% endif %}>
+                                            {% if usuario.activo %}
+                                            <i class="fas fa-ban"></i> Desactivar
+                                            {% else %}
+                                            <i class="fas fa-check"></i> Activar
+                                            {% endif %}
+                                        </button>
+
+                                        <!-- Botón Eliminar -->
+                                        <button class="btn btn-sm btn-outline-danger eliminar-usuario"
+                                                data-usuario-id="{{ usuario.id }}"
+                                                data-usuario-name="{{ usuario.username }}"
+                                                {% if usuario.id == current_user.id %}disabled{% endif %}>
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </button>
+
+
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5>No hay usuarios registrados</h5>
+                    <p class="text-muted">No se encontraron usuarios en el sistema.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Información de Roles -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card border-danger">
+                    <div class="card-body">
+                        <h6 class="card-title text-danger">
+                            <i class="fas fa-crown"></i> Administrador
+                        </h6>
+                        <p class="card-text small">
+                            Acceso completo al sistema, incluyendo administración y configuración.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-warning">
+                    <div class="card-body">
+                        <h6 class="card-title text-warning">
+                            <i class="fas fa-user-shield"></i> Coordinador
+                        </h6>
+                        <p class="card-text small">
+                            Puede ver reportes y gestionar estudiantes, pero no configurar el sistema.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-secondary">
+                    <div class="card-body">
+                        <h6 class="card-title text-secondary">
+                            <i class="fas fa-chalkboard-teacher"></i> Docente
+                        </h6>
+                        <p class="card-text small">
+                            Acceso básico para registrar notas y asistencias de sus cursos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle estado de usuario
+    document.querySelectorAll('.toggle-usuario').forEach(button => {
+        button.addEventListener('click', function() {
+            const usuarioId = this.getAttribute('data-usuario-id');
+            
+            fetch(`/admin/usuarios/${usuarioId}/toggle`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    location.reload(); // Recargar para ver cambios
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cambiar estado del usuario');
+            });
+        });
+    });
+
+    // Cambiar rol de usuario
+    document.querySelectorAll('.cambiar-rol').forEach(link => {
+        link.addEventListener('click', function() {
+            const usuarioId = this.getAttribute('data-usuario-id');
+            const nuevoRol = this.getAttribute('data-rol');
+            
+            if (!confirm(`¿Está seguro de cambiar el rol a ${nuevoRol}?`)) {
+                return;
+            }
+            
+            fetch(`/admin/usuarios/${usuarioId}/cambiar-rol`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ rol: nuevoRol })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    location.reload(); // Recargar para ver cambios
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cambiar rol del usuario');
+            });
+        });
+    });
+});
+
+// Eliminar usuario
+document.querySelectorAll('.eliminar-usuario').forEach(button => {
+    button.addEventListener('click', function() {
+        const usuarioId = this.getAttribute('data-usuario-id');
+        const usuarioName = this.getAttribute('data-usuario-name');
+        
+        if (!confirm(`¿Está seguro de eliminar al usuario "${usuarioName}"? Esta acción no se puede deshacer.`)) {
+            return;
+        }
+        
+        fetch(`/admin/usuarios/${usuarioId}/eliminar`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                location.reload(); // Recargar para ver cambios
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al eliminar usuario');
+        });
+    });
+});
+
+// Validación de contraseñas en el modal
+document.getElementById('formCrearUsuario').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        alert('Las contraseñas no coinciden');
+        return false;
+    }
+    
+    if (password.length < 6) {
+        e.preventDefault();
+        alert('La contraseña debe tener al menos 6 caracteres');
+        return false;
+    }
+});
+</script>
+
+<!-- Modal Crear Usuario -->
+ <!-- Modal para Crear Usuario -->
+<div class="modal fade" id="modalCrearUsuario" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus text-primary"></i>
+                    Crear Nuevo Usuario
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formCrearUsuario" method="POST" action="{{ url_for('admin.crear_usuario') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nombre de Usuario *</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email *</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña *</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirmar Contraseña *</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rol" class="form-label">Rol *</label>
+                        <select class="form-select" id="rol" name="rol" required>
+                            <option value="docente">Docente</option>
+                            <option value="coordinador">Coordinador</option>
+                            <option value="administrador">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

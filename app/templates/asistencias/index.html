@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Asistencias - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Asistencias</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-calendar-check text-primary"></i>
+                Gestión de Asistencias
+            </h2>
+            <div>
+                <a href="{{ url_for('asistencias.estadisticas') }}" class="btn btn-info me-2 bg-cards2">
+                    <i class="fas fa-chart-bar"></i> Estadísticas
+                </a>
+                <a href="{{ url_for('asistencias.crear_masiva') }}" class="btn btn-primary me-2 bg-azul">
+                    <i class="fas fa-users"></i> Registro Masivo
+                </a>
+                <a href="{{ url_for('asistencias.crear') }}" class="btn btn-primary bg-cards">
+                    <i class="fas fa-plus"></i> Nueva Asistencia
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-header bg-cards text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-filter"></i>
+                    Filtros
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('asistencias.index') }}">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="estudiante_id" class="form-label">Estudiante</label>
+                                <select class="form-select" id="estudiante_id" name="estudiante_id">
+                                    <option value="">Todos los estudiantes</option>
+                                    {% for estudiante in estudiantes %}
+                                    <option value="{{ estudiante.id }}" {% if estudiante_id == estudiante.id %}selected{% endif %}>
+                                        {{ estudiante.codigo_estudiante }} - {{ estudiante.nombres }} {{ estudiante.apellidos }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="curso_id" class="form-label">Curso</label>
+                                <select class="form-select" id="curso_id" name="curso_id">
+                                    <option value="">Todos los cursos</option>
+                                    {% for curso in cursos %}
+                                    <option value="{{ curso.id }}" {% if curso_id == curso.id %}selected{% endif %}>
+                                        {{ curso.codigo_curso }} - {{ curso.nombre_curso }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="fecha" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="fecha" name="fecha" value="{{ fecha }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="estado_asistencia" class="form-label">Estado</label>
+                                <select class="form-select" id="estado_asistencia" name="estado_asistencia">
+                                    <option value="">Todos</option>
+                                    <option value="PRESENTE" {% if estado_asistencia == 'PRESENTE' %}selected{% endif %}>Presente</option>
+                                    <option value="AUSENTE" {% if estado_asistencia == 'AUSENTE' %}selected{% endif %}>Ausente</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary bg-cards">
+                            <i class="fas fa-filter"></i> Aplicar Filtros
+                        </button>
+                        <a href="{{ url_for('asistencias.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Limpiar Filtros
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla de asistencias -->
+        <div class="card">
+            <div class="card-header bg-cards2 text-white">
+                <h5 class="card-title mb-0">
+                    Lista de Asistencias
+                    <span class="badge bg-cards3 text-dark">{{ asistencias.total }}</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if asistencias.items %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Curso</th>
+                                <th>Fecha</th>
+                                <th>Asistencia</th>
+                                <th>Justificado</th>
+                                <th>Observaciones</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asistencia in asistencias.items %}
+                            <tr>
+                                <td>
+                                    <strong>{{ asistencia.inscripcion.estudiante.codigo_estudiante }}</strong><br>
+                                    <small>{{ asistencia.inscripcion.estudiante.nombres }} {{ asistencia.inscripcion.estudiante.apellidos }}</small>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('cursos.detalle', curso_id=asistencia.inscripcion.curso.id) }}">
+                                        {{ asistencia.inscripcion.curso.nombre_curso }}
+                                    </a><br>
+                                    <small class="text-muted">{{ asistencia.inscripcion.curso.semestre }}</small>
+                                </td>
+                                <td>{{ asistencia.fecha.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    {% if asistencia.presente %}
+                                    <span class="badge bg-success">Presente</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Ausente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if asistencia.justificado %}
+                                    <span class="badge bg-warning text-dark">Sí</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if asistencia.observaciones %}
+                                    <small class="text-muted">{{ asistencia.observaciones|truncate(30) }}</small>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('asistencias.detalle', asistencia_id=asistencia.id) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        <a href="{{ url_for('asistencias.editar', asistencia_id=asistencia.id) }}"
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <form method="POST" action="{{ url_for('asistencias.eliminar', asistencia_id=asistencia.id) }}" 
+                                              class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar este registro de asistencia?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h5>No se encontraron registros de asistencia</h5>
+                    <p class="text-muted">
+                        {% if estudiante_id or curso_id or fecha or estado_asistencia %}
+                        No hay resultados con los filtros aplicados
+                        {% else %}
+                        No hay asistencias registradas en el sistema
+                        {% endif %}
+                    </p>
+                    <a href="{{ url_for('asistencias.crear') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Registrar Primera Asistencia
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Paginación -->
+            {% if asistencias.pages > 1 %}
+            <div class="card-footer">
+                <nav aria-label="Paginación">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% for page_num in asistencias.iter_pages() %}
+                        {% if page_num %}
+                        <li class="page-item {% if page_num == asistencias.page %}active{% endif %}">
+                            <a class="page-link"
+                               href="{{ url_for('asistencias.index', page=page_num, estudiante_id=estudiante_id, curso_id=curso_id, fecha=fecha, estado_asistencia=estado_asistencia) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

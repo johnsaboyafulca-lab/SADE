@@ -1,0 +1,328 @@
+<html lang="es">
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Individual de Riesgo Académico</title>
+    <style>
+        /* Estilos para impresión */
+        @media print {
+            .no-print { display: none !important; }
+            .container { width: 100% !important; }
+        }
+        
+        body { font-family: 'Arial', sans-serif; line-height: 1.6; }
+        .header { border-bottom: 3px solid #2c3e50; padding-bottom: 20px; margin-bottom: 30px; }
+        .logo { max-width: 150px; }
+        .institucion { color: #2c3e50; font-weight: bold; }
+        .badge-riesgo { font-size: 1.1em; padding: 8px 15px; }
+        .table-condensed td, .table-condensed th { padding: 8px; }
+        
+        /* NUEVOS ESTILOS PARA FIRMAS LADO A LADO */
+        .firmas-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 100px;
+            page-break-inside: avoid;
+            .card { border: none !important; box-shadow: none !important; }
+        }
+        .firma {
+            text-align: center;
+            width: 45%;
+        }
+        .firma-linea {
+            border-top: 1px solid #000;
+            margin: 60px 0 10px 0;
+            width: 100%;
+        }
+        .firma-texto {
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
+        .recomendaciones { background-color: #f8f9fa; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="header text-center">
+            <table width="100%">
+                <tr>
+                    <td width="20%">
+                        <img src="{{ url_for('static', filename='img/logo_see_f.png', _external=True) }}" 
+                             alt="Logo" class="logo" style="max-width: 120px;">
+                    </td>
+                    <td width="60%" class="text-center">
+                        <h2 class="institucion">Sistema de Seguimiento Estudiantil</h2>
+                        <h4>Reporte Individual de Riesgo Académico</h4>
+                        <p class="text-muted">Generado el: {{ fecha_generacion }}</p>
+                    </td>
+                    <td width="20%" class="text-end">
+                        <small>Semestre: {{ semestre }}</small>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Información del Estudiante -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-graduate"></i>
+                    Información del Estudiante
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless table-condensed">
+                            <tr>
+                                <td width="40%"><strong>Código:</strong></td>
+                                <td>{{ estudiante.codigo_estudiante }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nombres:</strong></td>
+                                <td>{{ estudiante.nombres }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Apellidos:</strong></td>
+                                <td>{{ estudiante.apellidos }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>{{ estudiante.email }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless table-condensed">
+                            <tr>
+                                <td width="40%"><strong>Teléfono:</strong></td>
+                                <td>{{ estudiante.telefono or 'No registrado' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fecha Inscripción:</strong></td>
+                                <td>{{ estudiante.fecha_inscripcion.strftime('%d/%m/%Y') }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Estado:</strong></td>
+                                <td>
+                                    {% if estudiante.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluación de Riesgo -->
+        {% if seguimiento %}
+        <div class="card mb-4">
+            <div class="card-header 
+                {% if seguimiento.categoria_riesgo == 'ALERTA_ROJA' %}bg-danger
+                {% elif seguimiento.categoria_riesgo == 'ALERTA_AMARILLA' %}bg-warning text-dark
+                {% else %}bg-success{% endif %} text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line"></i>
+                    Evaluación de Riesgo Académico
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h3>
+                            <span class="badge badge-riesgo 
+                                {% if seguimiento.categoria_riesgo == 'ALERTA_ROJA' %}bg-danger
+                                {% elif seguimiento.categoria_riesgo == 'ALERTA_AMARILLA' %}bg-warning text-dark
+                                {% else %}bg-success{% endif %}">
+                                {{ seguimiento.categoria_riesgo.replace('_', ' ') }}
+                            </span>
+                        </h3>
+                        <p class="text-muted">Categoría de Riesgo</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h2>{{ "%.2f"|format(seguimiento.puntaje_riesgo) }}</h2>
+                        <p class="text-muted">Puntaje de Riesgo</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>{{ seguimiento.fecha_evaluacion.strftime('%d/%m/%Y') }}</h4>
+                        <p class="text-muted">Fecha de Evaluación</p>
+                    </div>
+                </div>
+
+                {% if seguimiento.factores_riesgo %}
+                <div class="mt-4">
+                    <h6>Factores Evaluados:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Factor</th>
+                                    <th>Valor</th>
+                                    <th>Peso</th>
+                                    <th>Contribución</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for factor in seguimiento.factores_riesgo %}
+                                <tr>
+                                    <td>{{ factor.nombre }}</td>
+                                    <td>{{ "%.3f"|format(factor.valor) }}</td>
+                                    <td>{{ "%.0f"|format(factor.peso * 100) }}%</td>
+                                    <td>{{ "%.3f"|format(factor.valor * factor.peso) }}</td>
+                                    <td><small>{{ factor.descripcion }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            No se encontró evaluación de riesgo para este estudiante en el semestre {{ semestre }}.
+        </div>
+        {% endif %}
+
+        <!-- Rendimiento por Curso -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-book"></i>
+                    Rendimiento Académico por Curso
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if cursos %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Código</th>
+                                <th>Curso</th>
+                                <th>Promedio</th>
+                                <th>Asistencia</th>
+                                <th>Total Clases</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for curso_data in cursos %}
+                            <tr>
+                                <td>{{ curso_data.curso.codigo_curso }}</td>
+                                <td>{{ curso_data.curso.nombre_curso }}</td>
+                                <td>
+                                    {% if curso_data.promedio is string %}
+                                        {{ curso_data.promedio }}
+                                    {% else %}
+                                        <strong>{{ "%.1f"|format(curso_data.promedio) }}/20</strong>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if curso_data.total_clases > 0 %}
+                                        {{ "%.1f"|format(curso_data.asistencia) }}%
+                                    {% else %}
+                                        Sin registros
+                                    {% endif %}
+                                </td>
+                                <td>{{ curso_data.total_clases }}</td>
+                                <td>
+                                    {% if curso_data.promedio is not string and curso_data.promedio < 12 %}
+                                        <span class="badge bg-danger">En Riesgo</span>
+                                    {% elif curso_data.asistencia < 70 %}
+                                        <span class="badge bg-warning text-dark">Baja Asistencia</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Adecuado</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    El estudiante no está inscrito en cursos para el semestre {{ semestre }}.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        {% if seguimiento and seguimiento.factores_riesgo %}
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-lightbulb"></i>
+                    Recomendaciones y Plan de Acción
+                </h5>
+            </div>
+            <div class="card-body recomendaciones">
+                <ul class="list-unstyled">
+                    {% for factor in seguimiento.factores_riesgo %}
+                        {% if factor.valor > 0.5 %}
+                            {% if factor.nombre == "Rendimiento Actual" %}
+                                <li><i class="fas fa-book text-primary"></i> <strong>Reforzamiento académico:</strong> Programar tutorías en áreas críticas</li>
+                                <li><i class="fas fa-clock text-primary"></i> <strong>Planificación:</strong> Revisar técnicas de estudio y organización del tiempo</li>
+                            {% elif factor.nombre == "Asistencia Actual" %}
+                                <li><i class="fas fa-calendar text-success"></i> <strong>Asistencia:</strong> Implementar plan de mejora con seguimiento semanal</li>
+                                <li><i class="fas fa-handshake text-success"></i> <strong>Coordinación:</strong> Contactar con bienestar estudiantil</li>
+                            {% elif factor.nombre == "Distribución de Riesgo" %}
+                                <li><i class="fas fa-exclamation-triangle text-danger"></i> <strong>Priorización:</strong> Enfocar atención en cursos críticos</li>
+                                <li><i class="fas fa-balance-scale text-danger"></i> <strong>Carga académica:</strong> Evaluar posible ajuste de matrícula</li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if seguimiento.categoria_riesgo == 'ALERTA_AMARILLA' %}
+                        <li><i class="fas fa-calendar-check text-warning"></i> <strong>Seguimiento:</strong> Monitoreo quincenal por coordinación académica</li>
+                        <li><i class="fas fa-bullseye text-warning"></i> <strong>Metas:</strong> Establecer objetivos de mejora específicos</li>
+                    {% elif seguimiento.categoria_riesgo == 'ALERTA_ROJA' %}
+                        <li><i class="fas fa-exclamation-circle text-danger"></i> <strong>Urgente:</strong> Reunión inmediata requerida con el estudiante</li>
+                        <li><i class="fas fa-bell text-danger"></i> <strong>Notificación:</strong> Informar a departamento estudiantil y familia</li>
+                        <li><i class="fas fa-file-signature text-danger"></i> <strong>Documentación:</strong> Firmar compromiso de mejora académica</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Firmas -->
+        <div class="firmas-container">
+            <div class="firma">
+                <div class="firma-linea"></div>
+                <div class="firma-texto">Coordinador Académico</div>
+                <div class="firma-texto">Nombre y Firma</div>
+            </div>
+            <div class="firma">
+                <div class="firma-linea"></div>
+                <div class="firma-texto">Estudiante</div>
+                <div class="firma-texto">Nombre y Firma</div>
+            </div>
+        </div>
+
+        <!-- Pie -->
+        <div class="text-center mt-4 no-print">
+            <small class="text-muted">
+                Reporte generado por el Sistema de Seguimiento Estudiantil - {{ fecha_generacion }}
+            </small>
+            <br>
+            <button onclick="window.print()" class="btn btn-primary btn-sm mt-2">
+                <i class="fas fa-print"></i> Imprimir Reporte
+            </button>
+        </div>
+    </div>
+</body>
+</html>

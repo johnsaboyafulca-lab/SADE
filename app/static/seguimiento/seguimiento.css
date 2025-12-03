@@ -1,0 +1,30 @@
+:root{
+    --bg-primary: #07235c;
+    --bg-primary2: #395385;
+    --celeste: #6598e0;
+    --verde: #8ce4c0;
+    --amarillo: #f3f791;
+    --rojo: #eeb4a7;
+    --gris: #979696;
+    --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --border-radius: 4px;
+    --transition-duration: 0.3s;
+}
+
+.bg-primary2{
+
+    background-color: var(--bg-primary2) !important;
+}
+
+.bg-verde{
+    background-color: var(--verde);
+}
+.bg-ama{
+    background-color: var(--amarillo);
+}
+.bg-rojo{
+    background-color: var(--rojo);
+}
+.bg-celeste{
+    background-color: var(--celeste);
+}

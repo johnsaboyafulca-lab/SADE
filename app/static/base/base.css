@@ -1,0 +1,157 @@
+:root{
+    /* --bg-primary: #07235c; */
+    --bg-primary: #1c7d90;
+    --main-text-color: #333333;
+    --accent-color: #007BFF;
+    --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --border-radius: 4px;
+    --transition-duration: 0.3s;
+    --verde8: #b2efd6;
+    --amarilloc: #c1c959;
+    --rojo:#433535;
+
+    --paleta-carsd0:#31326F;
+    --paleta-carsd:#637AB9;
+    --paleta-carsd2:#4FB7B3;
+    --paleta-carsd3:#A8FBD3;
+
+}
+
+body{
+   
+    background-image: url(../img/fondo.png);
+    background-size: cover;
+    background-position: center; /* Centra la imagen */
+    /* background-repeat: no-repeat; */
+     height: 100vh;
+    
+}
+.fondo_principal{
+    background-color: var(--bg-primary);
+}
+
+.logo_see{
+    height: 4em;
+}
+
+.order_menu{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+}
+
+
+.separador{
+    margin: 0 1em;
+}
+
+.bg-rojo{
+    background-color: var(--rojo);
+}
+
+/* ======== BREADCRUMB SEGMENTADO ======== */
+
+nav[aria-label="breadcrumb"] {
+    display: inline-block;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.breadcrumb {
+    display: flex;
+    margin: 0;
+    background: none;
+    padding: 0;
+}
+
+.breadcrumb-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 1.2rem 0.6rem 2rem; /* 👈 más padding izquierda */
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgb(255, 255, 255);
+    white-space: nowrap;
+    transition: background 0.3s ease;
+}
+
+/* Colores por posición */
+.breadcrumb-item:nth-child(1) { background-color: var(--paleta-carsd); }
+.breadcrumb-item:nth-child(2) { background-color: var(--paleta-carsd2); }
+.breadcrumb-item:nth-child(3) { background-color: var(--paleta-carsd); }
+.breadcrumb-item:nth-child(4) { background-color: var(--paleta-carsd2); }
+
+/* Triángulo separador */
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "";
+    position: absolute;
+    left: -14px;
+    width: 24px;
+    height: 24px;
+    transform: rotate(45deg);
+    background: inherit;
+    z-index: 0;
+}
+
+/* Forma diagonal suave */
+.breadcrumb-item:not(:first-child) {
+    margin-left: 12px;
+    clip-path: polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 50%);
+}
+
+/* Bordes redondeados */
+.breadcrumb-item:first-child {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+}
+.breadcrumb-item:last-child {
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+/* Enlaces */
+.breadcrumb-item a {
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+}
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+/* Hover general */
+.breadcrumb-item:hover {
+    filter: brightness(1.2);
+    cursor: pointer;
+}
+
+/* Item activo */
+.breadcrumb-item.active {
+    font-weight: 600;
+    opacity: 1; /* eliminar transparencia */
+    cursor: default;
+    color: #000 !important; /* 👈 texto negro para legibilidad */
+    padding-left: 2.2rem; /* 👈 asegurar espacio para la primera letra */
+}
+
+
+nav[aria-label="breadcrumb"] {
+    display: block;
+    overflow-x: auto;      /* 👈 permite scroll horizontal */
+    white-space: nowrap;   /* 👈 evita que los items se rompan */
+    /* -webkit-overflow-scrolling: touch; */
+    padding-bottom: 0.5rem; 
+}
+
+.breadcrumb {
+    display: inline-flex; /* 👈 usar inline-flex para que no ocupe todo el ancho */
+    margin: 0;
+}
+
+

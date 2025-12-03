@@ -1,0 +1,19 @@
+:root{
+    --bg-primary: #07235c;
+    --bg-primary2: #395385;
+    --celeste: #6598e0;
+    --verde: #b2efd6;
+    --amarillo: #e3e849;
+    --amarilloc: #f0f69a;
+  
+    --gris: #979696;
+    --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --border-radius: 4px;
+    --transition-duration: 0.3s;
+}
+
+.bg-primary{
+
+    background-color: var(--bg-primary) !important;
+}
+

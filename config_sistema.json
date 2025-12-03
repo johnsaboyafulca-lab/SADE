@@ -1,0 +1,10 @@
+{
+  "umbral_amarillo": 0.5,
+  "umbral_rojo": 0.7,
+  "peso_rendimiento": 0.4,
+  "peso_asistencia": 0.3,
+  "peso_distribucion": 0.3,
+  "semestre_actual": "2025-1",
+  "nota_minima_aprobatoria": 12.0,
+  "porcentaje_asistencia_minimo": 70.0
+}

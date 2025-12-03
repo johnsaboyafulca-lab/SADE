@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Vista Previa - {{ titulo }}{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="no-print">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('reportes.index') }}">Reportes</a></li>
+        <li class="breadcrumb-item active">Vista Previa</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+            <h2>
+                <i class="fas fa-eye text-primary"></i>
+                Vista Previa del Reporte
+            </h2>
+            <div>
+                <a href="{{ url_for('reportes.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <button onclick="imprimirFormal()" class="btn btn-primary">
+                    <i class="fas fa-print"></i> Imprimir Formal
+                </button>
+                {% if reporte_id %}
+                <a href="{{ url_for('reportes.descargar', reporte_id=reporte_id) }}" class="btn btn-success">
+                    <i class="fas fa-download"></i> Descargar PDF
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Contenedor del reporte con clase para impresión -->
+        <div class="reporte-container" id="reporteContent">
+            <div class="card printable-card">
+                <div class="card-header bg-primary text-white printable-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line"></i> {{ titulo }}
+                    </h5>
+                </div>
+                <div class="card-body printable-content">
+                    <!-- Contenido del reporte -->
+                    {{ contenido|safe }}
+                </div>
+                <div class="card-footer text-muted printable-footer no-print">
+                    <small>Generado el {{ fecha_generacion }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* ESTILOS PARA VISTA WEB */
+    .printable-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .printable-header {
+        border-radius: 8px 8px 0 0 !important;
+        padding: 15px 20px;
+    }
+    
+    .printable-content {
+        padding: 25px;
+        background: #fff;
+    }
+    
+    .printable-footer {
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        border-radius: 0 0 8px 8px;
+    }
+
+    /* ESTILOS PROFESIONALES PARA IMPRESIÓN */
+    @media print {
+        /* Ocultar elementos no deseados */
+        .no-print, .breadcrumb, .btn, .card-footer, 
+        .navbar, .sidebar, .page-header {
+            display: none !important;
+        }
+        
+        /* Resetear estilos para impresión */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            font-family: "Times New Roman", Times, serif !important;
+            font-size: 12pt !important;
+            line-height: 1.4 !important;
+            color: black !important;
+        }
+        
+        .container, .container-fluid {
+            width: 100% !important;
+            max-width: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        .row, .col-12 {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+        
+        /* Estilos para el reporte impreso */
+        .printable-card {
+            border: none !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            page-break-inside: avoid;
+        }
+        
+        .printable-header {
+            background: #2c3e50 !important;
+            color: white !important;
+            padding: 15px 0 !important;
+            text-align: center !important;
+            border-bottom: 2px solid #34495e !important;
+            margin-bottom: 20px !important;
+        }
+        
+        .printable-header h5 {
+            font-size: 16pt !important;
+            margin: 0 !important;
+            font-weight: bold !important;
+        }
+        
+        .printable-content {
+            padding: 0 !important;
+            margin: 0 !important;
+            background: white !important;
+        }
+        
+        /* Mejoras para tablas en impresión */
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin: 15px 0 !important;
+            font-size: 10pt !important;
+            page-break-inside: avoid;
+        }
+        
+        th, td {
+            border: 1px solid #000 !important;
+            padding: 6px 8px !important;
+            text-align: left !important;
+        }
+        
+        th {
+            background-color: #f0f0f0 !important;
+            font-weight: bold !important;
+        }
+        
+        /* Mejoras para textos */
+        h1, h2, h3, h4, h5, h6 {
+            color: #000 !important;
+            page-break-after: avoid;
+        }
+        
+        h1 { font-size: 16pt !important; }
+        h2 { font-size: 14pt !important; }
+        h3 { font-size: 12pt !important; }
+        
+        /* Control de saltos de página */
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .no-break {
+            page-break-inside: avoid;
+        }
+        
+        /* Encabezado y pie de página para impresión */
+        @page {
+            margin: 1cm;
+            size: A4;
+            
+            @top-left {
+                content: "Sistema de Seguimiento Estudiantil";
+                font-size: 9pt;
+                color: #666;
+            }
+            
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 9pt;
+                color: #666;
+            }
+        }
+        
+        /* Estilos específicos para alertas */
+        .alerta-roja { 
+            color: #000 !important; 
+            font-weight: bold !important;
+            background-color: #ffebee !important;
+        }
+        
+        .alerta-amarilla { 
+            color: #000 !important; 
+            font-weight: bold !important;
+            background-color: #fff8e1 !important;
+        }
+        
+        .sin-riesgo { 
+            color: #000 !important; 
+            font-weight: bold !important;
+            background-color: #e8f5e8 !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function imprimirFormal() {
+        // Agregar clase temporal para impresión
+        document.body.classList.add('printing');
+        
+        // Esperar un momento para que se apliquen los estilos
+        setTimeout(() => {
+            window.print();
+            
+            // Remover clase después de imprimir
+            setTimeout(() => {
+                document.body.classList.remove('printing');
+            }, 500);
+        }, 100);
+    }
+    
+    // Mejorar la experiencia de impresión
+    window.addEventListener('beforeprint', function() {
+        // Preparar contenido para impresión
+        console.log('Preparando para impresión...');
+    });
+    
+    window.addEventListener('afterprint', function() {
+        // Restaurar después de imprimir
+        console.log('Impresión completada');
+    });
+</script>
+{% endblock %}

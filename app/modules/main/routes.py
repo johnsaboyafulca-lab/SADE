@@ -1,6 +1,8 @@
-from flask import render_template
+# app/modules/main/routes.py
+from flask import redirect, url_for
 from . import main_bp
 
 @main_bp.route('/')
 def index():
-    return render_template('main/index.html')
+    """Ruta raíz principal - redirige al login"""
+    return redirect(url_for('auth.login'))

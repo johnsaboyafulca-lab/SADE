@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Evaluaciones - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Evaluaciones</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-clipboard-check text-primary"></i>
+                Gestión de Evaluaciones
+            </h2>
+            <div>
+                <a href="{{ url_for('evaluaciones.notas_index') }}" class="btn btn-info me-2 bg-cards2">
+                    <i class="fas fa-chart-bar"></i> Ver Notas
+                </a>
+                <a href="{{ url_for('evaluaciones.crear_evaluacion') }}" class="btn btn-primary bg-cards">
+                    <i class="fas fa-plus"></i> Nueva Evaluación
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-header bg-cards2">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-filter"></i>
+                    Filtros
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('evaluaciones.index') }}">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="curso_id" class="form-label">Curso</label>
+                                <select class="form-select" id="curso_id" name="curso_id">
+                                    <option value="">Todos los cursos</option>
+                                    {% for curso in cursos %}
+                                    <option value="{{ curso.id }}" {% if curso_id == curso.id %}selected{% endif %}>
+                                        {{ curso.codigo_curso }} - {{ curso.nombre_curso }} ({{ curso.semestre }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="tipo_evaluacion" class="form-label">Tipo de Evaluación</label>
+                                <select class="form-select" id="tipo_evaluacion" name="tipo_evaluacion">
+                                    <option value="">Todos los tipos</option>
+                                    {% for tipo in tipos_evaluacion %}
+                                    <option value="{{ tipo }}" {% if tipo_evaluacion == tipo %}selected{% endif %}>
+                                        {{ tipo.replace('_', ' ').title() }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="search" class="form-label">Búsqueda</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       value="{{ search }}" placeholder="Buscar evaluación...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary bg-cards">
+                            <i class="fas fa-filter"></i> Aplicar Filtros
+                        </button>
+                        <a href="{{ url_for('evaluaciones.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Limpiar Filtros
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla de evaluaciones -->
+        <div class="card">
+            <div class="card-header text-white bg-cards">
+                <h5 class="card-title mb-0">
+                    Lista de Evaluaciones
+                    <span class="badge bg-cards2">{{ evaluaciones.total }}</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if evaluaciones.items %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Evaluación</th>
+                                <th>Curso</th>
+                                <th>Semestre</th>
+                                <th>Tipo</th>
+                                <th>Peso</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for evaluacion in evaluaciones.items %}
+                            <tr>
+                                <td>
+                                    <strong>{{ evaluacion.nombre_evaluacion }}</strong>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('cursos.detalle', curso_id=evaluacion.curso.id) }}">
+                                        {{ evaluacion.curso.nombre_curso }}
+                                    </a><br>
+                                    <small class="text-muted">{{ evaluacion.curso.codigo_curso }}</small>
+                                </td>
+                                <td>{{ evaluacion.curso.semestre }}</td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ evaluacion.tipo_evaluacion.replace('_', ' ').title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong>{{ "%.1f"|format(evaluacion.peso) }}%</strong>
+                                </td>
+                                <td>{{ evaluacion.fecha_creacion.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('evaluaciones.detalle_evaluacion', evaluacion_id=evaluacion.id) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        <a href="{{ url_for('evaluaciones.editar_evaluacion', evaluacion_id=evaluacion.id) }}"
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <form method="POST" action="{{ url_for('evaluaciones.eliminar_evaluacion', evaluacion_id=evaluacion.id) }}" 
+                                              class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta evaluación?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
+                    <h5>No se encontraron evaluaciones</h5>
+                    <p class="text-muted">
+                        {% if search or curso_id or tipo_evaluacion %}
+                        No hay resultados con los filtros aplicados
+                        {% else %}
+                        No hay evaluaciones registradas en el sistema
+                        {% endif %}
+                    </p>
+                    <a href="{{ url_for('evaluaciones.crear_evaluacion') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Crear Primera Evaluación
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Paginación -->
+            {% if evaluaciones.pages > 1 %}
+            <div class="card-footer">
+                <nav aria-label="Paginación">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% for page_num in evaluaciones.iter_pages() %}
+                        {% if page_num %}
+                        <li class="page-item {% if page_num == evaluaciones.page %}active{% endif %}">
+                            <a class="page-link"
+                               href="{{ url_for('evaluaciones.index', page=page_num, search=search, curso_id=curso_id, tipo_evaluacion=tipo_evaluacion) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

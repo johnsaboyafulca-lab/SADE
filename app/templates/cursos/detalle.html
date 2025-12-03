@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}{{ curso.nombre_curso }} - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('cursos.index') }}">Cursos</a></li>
+        <li class="breadcrumb-item active">{{ curso.nombre_curso }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-book text-dark"></i>
+                {{ curso.nombre_curso }}
+            </h2>
+            <div>
+                <a href="{{ url_for('cursos.editar', curso_id=curso.id) }}" class="btn btn-primary me-2 bg-cards2">
+                    <i class="fas fa-edit"></i> Editar Curso
+                </a>
+                <form method="POST" action="{{ url_for('cursos.eliminar', curso_id=curso.id) }}" 
+                      class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar este curso?');">
+                    <button type="submit" class="btn btn-primary bg-cards">
+                        <i class="fas fa-trash"></i> Eliminar Curso
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Información del Curso -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-cards text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle"></i>
+                            Información del Curso
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Código:</div>
+                            <div class="col-sm-8">{{ curso.codigo_curso }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Nombre:</div>
+                            <div class="col-sm-8">{{ curso.nombre_curso }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Créditos:</div>
+                            <div class="col-sm-8">{{ curso.creditos }}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Semestre:</div>
+                            <div class="col-sm-8">{{ curso.semestre }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 fw-bold">Estado:</div>
+                            <div class="col-sm-8">
+                                {% if curso.activo %}
+                                <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-cards2 text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-bar"></i>
+                            Estadísticas del Curso
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 bg-">
+                                <h3>{{ inscripciones|length }}</h3>
+                                <p class="text-muted mb-0">Estudiantes Inscritos</p>
+                            </div>
+                            <div class="col-6">
+                                <h3>{{ evaluaciones|length }}</h3>
+                                <p class="text-muted mb-0">Evaluaciones</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estudiantes Inscritos -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-cards2 text-light">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-users"></i>
+                            Estudiantes Inscritos
+                            <span class="badge bg-cards">{{ inscripciones|length }}</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if inscripciones %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Estudiante</th>
+                                        <th>Código</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for inscripcion in inscripciones %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('estudiantes.detalle', estudiante_id=inscripcion.estudiante.id) }}">
+                                                {{ inscripcion.estudiante.nombres }} {{ inscripcion.estudiante.apellidos }}
+                                            </a>
+                                        </td>
+                                        <td>{{ inscripcion.estudiante.codigo_estudiante }}</td>
+                                        <td>
+                                            <span class="badge {% if inscripcion.estado == 'ACTIVO' %}bg-success{% else %}bg-secondary{% endif %}">
+                                                {{ inscripcion.estado }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-users-slash fa-2x mb-2"></i>
+                            <p>No hay estudiantes inscritos en este curso</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluaciones -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-cards text-light">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-clipboard-list"></i>
+                            Evaluaciones del Curso
+                            <span class="badge bg-cards2">{{ evaluaciones|length }}</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if evaluaciones %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Evaluación</th>
+                                        <th>Tipo</th>
+                                        <th>Peso</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for evaluacion in evaluaciones %}
+                                    <tr>
+                                        <td>{{ evaluacion.nombre_evaluacion }}</td>
+                                        <td>{{ evaluacion.tipo_evaluacion or 'No especificado' }}</td>
+                                        <td>{{ evaluacion.peso }}%</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-clipboard fa-2x mb-2"></i>
+                            <p>No hay evaluaciones registradas para este curso</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('cursos.index') }}" class="btn btn-primary bg-cards2">
+                        <i class="fas fa-arrow-left"></i> Volver a la lista
+                    </a>
+                    <a href="{{ url_for('cursos.crear') }}" class="btn btn-primary bg-cards">
+                        <i class="fas fa-plus"></i> Crear Nuevo Curso
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

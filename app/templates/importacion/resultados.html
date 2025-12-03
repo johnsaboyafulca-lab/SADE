@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Resultados - Sistema de Seguimiento{% endblock %}
+{% block content %} 
+   
+
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('importacion.index') }}">Importación</a></li>
+                <li class="breadcrumb-item active">Resultados</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-clipboard-check text-dark"></i>
+                        Resultados de Importación
+                    </h2>
+                    <a href="{{ url_for('importacion.index') }}" class="btn btn-primary text-light bg-cards2">
+                        <i class="fas fa-arrow-left"></i> Volver a Importación
+                    </a>
+                </div>
+
+                <!-- Mensajes Flash -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Estadísticas Rápidas -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-cards0 text-white">
+                            <div class="card-body text-center">
+                                {% set total_estudiantes = estadisticas.estudiantes if estadisticas else 0 %}
+                                <h3>{{ total_estudiantes }}</h3>
+                                <p class="mb-0">Estudiantes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-cards text-white">
+                            <div class="card-body text-center">
+                                {% set total_cursos = estadisticas.cursos if estadisticas else 0 %}
+                                <h3>{{ total_cursos }}</h3>
+                                <p class="mb-0">Cursos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-cards2 text-white">
+                            <div class="card-body text-center">
+                                {% set total_notas = estadisticas.notas if estadisticas else 0 %}
+                                <h3>{{ total_notas }}</h3>
+                                <p class="mb-0">Notas</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-cards3 text-dark">
+                            <div class="card-body text-center">
+                                {% set total_riesgo = estadisticas.riesgo if estadisticas else 0 %}
+                                <h3>{{ total_riesgo }}</h3>
+                                <p class="mb-0">En Riesgo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h4>Proceso de Importación Completado</h4>
+                        <p class="text-muted">
+                            Los datos han sido importados exitosamente al sistema.
+                            Ahora puede proceder a ejecutar el cálculo de riesgo académico.
+                        </p>
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <a href="{{ url_for('estudiantes.index') }}" class="btn btn-primary bg-cards2">
+                                <i class="fas fa-users"></i> Ver Estudiantes
+                            </a>
+                            <a href="{{ url_for('seguimiento.index') }}" class="btn btn-primary bg-cards">
+                                <i class="fas fa-calculator"></i> Calcular Riesgo
+                            </a>
+                            <a href="{{ url_for('importacion.index') }}" class="btn btn-primary bg-cards0">
+                                <i class="fas fa-file-import"></i> Nueva Importación
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+ {% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Registro Masivo de Asistencias - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('asistencias.index') }}">Asistencias</a></li>
+        <li class="breadcrumb-item active">Registro Masivo</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-users text-primary"></i>
+                Registro Masivo de Asistencias
+            </h2>
+            <a href="{{ url_for('asistencias.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver a la lista
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cog"></i>
+                    Configurar Registro Masivo
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('asistencias.crear_masiva') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.curso_id.label(class="form-label") }}
+                                {{ form.curso_id(class="form-select") }}
+                                {% if form.curso_id.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.curso_id.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Seleccione el curso para registrar asistencias</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.fecha.label(class="form-label") }}
+                                {{ form.fecha(class="form-control", type="date") }}
+                                {% if form.fecha.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.fecha.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Fecha de la clase</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Información:</strong> Esta acción generará un formulario para registrar 
+                        la asistencia de todos los estudiantes del curso seleccionado en la fecha especificada.
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('asistencias.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        {{ form.submit(class="btn btn-success") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

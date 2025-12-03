@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Administración</a></li>
+        <li class="breadcrumb-item active">Configuración</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-sliders-h text-primary"></i>
+                Configuración del Sistema
+            </h2>
+            <a href="{{ url_for('admin.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <form method="POST" action="{{ url_for('admin.configuracion') }}">
+            <div class="row">
+                <!-- Umbrales de Riesgo -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Umbrales de Riesgo
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="umbral_amarillo" class="form-label">
+                                    Umbral Alerta Amarilla
+                                    <small class="text-muted">(0.0 - 1.0)</small>
+                                </label>
+                                <input type="number" class="form-control" id="umbral_amarillo" 
+                                       name="umbral_amarillo" step="0.01" min="0" max="1"
+                                       value="{{ "%.2f"|format(config.umbral_amarillo) }}" required>
+                                <div class="form-text">
+                                    Puntaje mínimo para considerar Alerta Amarilla
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="umbral_rojo" class="form-label">
+                                    Umbral Alerta Roja
+                                    <small class="text-muted">(0.0 - 1.0)</small>
+                                </label>
+                                <input type="number" class="form-control" id="umbral_rojo" 
+                                       name="umbral_rojo" step="0.01" min="0" max="1"
+                                       value="{{ "%.2f"|format(config.umbral_rojo) }}" required>
+                                <div class="form-text">
+                                    Puntaje mínimo para considerar Alerta Roja
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pesos de Factores - ACTUALIZADO A 3 FACTORES -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-balance-scale"></i>
+                                Pesos de Factores - Semestre Actual
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="peso_rendimiento" class="form-label">
+                                    Peso Rendimiento Académico
+                                    <small class="text-muted">(0.0 - 1.0)</small>
+                                </label>
+                                <input type="number" class="form-control" id="peso_rendimiento" 
+                                       name="peso_rendimiento" step="0.01" min="0" max="1"
+                                       value="{{ "%.2f"|format(config.peso_rendimiento) }}" required>
+                                <div class="form-text">
+                                    Evaluación de notas y promedios del semestre actual
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="peso_asistencia" class="form-label">
+                                    Peso Asistencia
+                                    <small class="text-muted">(0.0 - 1.0)</small>
+                                </label>
+                                <input type="number" class="form-control" id="peso_asistencia" 
+                                       name="peso_asistencia" step="0.01" min="0" max="1"
+                                       value="{{ "%.2f"|format(config.peso_asistencia) }}" required>
+                                <div class="form-text">
+                                    Porcentaje de asistencia en el semestre actual
+                                </div>
+                            </div>
+
+                            <!-- NUEVO FACTOR: Distribución de Riesgo -->
+                            <div class="mb-3">
+                                <label for="peso_distribucion" class="form-label">
+                                    Peso Distribución de Riesgo
+                                    <small class="text-muted">(0.0 - 1.0)</small>
+                                </label>
+                                <input type="number" class="form-control" id="peso_distribucion" 
+                                       name="peso_distribucion" step="0.01" min="0" max="1"
+                                       value="{{ "%.2f"|format(config.peso_distribucion) }}" required>
+                                <div class="form-text">
+                                    Análisis de cuántos cursos individuales están en riesgo
+                                </div>
+                            </div>
+
+                            <!-- ELIMINADOS: peso_progreso y peso_historial -->
+
+                            <div class="alert alert-light">
+                                <strong>Total Pesos: </strong>
+                                <span id="total_pesos">{{ "%.2f"|format(config.peso_rendimiento + config.peso_asistencia + config.peso_distribucion) }}</span>
+                                <span id="pesos_status" class="badge ms-2"></span>
+                                <div class="form-text mt-1">
+                                    <small>Los tres factores deben sumar exactamente 1.0</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parámetros Académicos -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-graduation-cap"></i>
+                                Parámetros Académicos
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="nota_minima_aprobatoria" class="form-label">
+                                    Nota Mínima Aprobatoria
+                                    <small class="text-muted">(0 - 20)</small>
+                                </label>
+                                <input type="number" class="form-control" id="nota_minima_aprobatoria" 
+                                       name="nota_minima_aprobatoria" step="0.1" min="0" max="20"
+                                       value="{{ "%.1f"|format(config.nota_minima_aprobatoria) }}" required>
+                                <div class="form-text">
+                                    Nota mínima para considerar aprobado
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="porcentaje_asistencia_minimo" class="form-label">
+                                    Porcentaje Mínimo de Asistencia
+                                    <small class="text-muted">(0 - 100%)</small>
+                                </label>
+                                <input type="number" class="form-control" id="porcentaje_asistencia_minimo" 
+                                       name="porcentaje_asistencia_minimo" step="1" min="0" max="100"
+                                       value="{{ "%.0f"|format(config.porcentaje_asistencia_minimo) }}" required>
+                                <div class="form-text">
+                                    Porcentaje mínimo de asistencia requerido
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar-alt"></i>
+                                Semestre
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="semestre_actual" class="form-label">Semestre Actual</label>
+                                <input type="text" class="form-control" id="semestre_actual" 
+                                       name="semestre_actual" value="{{ config.semestre_actual }}" required>
+                                <div class="form-text">
+                                    Formato: AÑO-NÚMERO (ej: 2024-1, 2024-2)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar Configuración
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ACTUALIZADO: Solo 3 factores
+    const pesos = ['peso_rendimiento', 'peso_asistencia', 'peso_distribucion'];
+    const totalPesosElement = document.getElementById('total_pesos');
+    const pesosStatusElement = document.getElementById('pesos_status');
+    
+    function calcularTotalPesos() {
+        let total = 0;
+        pesos.forEach(pesoId => {
+            const input = document.getElementById(pesoId);
+            if (input && input.value) {
+                total += parseFloat(input.value) || 0;
+            }
+        });
+        
+        totalPesosElement.textContent = total.toFixed(2);
+        
+        // Actualizar estado
+        if (Math.abs(total - 1.0) < 0.01) {
+            pesosStatusElement.textContent = '✅ Correcto';
+            pesosStatusElement.className = 'badge bg-success ms-2';
+        } else {
+            pesosStatusElement.textContent = '❌ Debe sumar 1.0';
+            pesosStatusElement.className = 'badge bg-danger ms-2';
+        }
+    }
+    
+    // Calcular inicialmente
+    calcularTotalPesos();
+    
+    // Recalcular cuando cambien los inputs
+    pesos.forEach(pesoId => {
+        const input = document.getElementById(pesoId);
+        if (input) {
+            input.addEventListener('input', calcularTotalPesos);
+        }
+    });
+});
+</script>
+{% endblock %}

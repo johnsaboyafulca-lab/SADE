@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Curso - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('cursos.index') }}">Cursos</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('cursos.detalle', curso_id=curso.id) }}">{{ curso.nombre_curso }}</a></li>
+        <li class="breadcrumb-item active">Editar</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-edit text-primary"></i>
+                Editar Curso
+            </h2>
+            <a href="{{ url_for('cursos.detalle', curso_id=curso.id) }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver al detalle
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-edit"></i>
+                    Editar Información del Curso
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('cursos.editar', curso_id=curso.id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.codigo_curso.label(class="form-label") }}
+                                {{ form.codigo_curso(class="form-control") }}
+                                {% if form.codigo_curso.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.codigo_curso.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.semestre.label(class="form-label") }}
+                                {{ form.semestre(class="form-control") }}
+                                {% if form.semestre.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.semestre.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                {{ form.nombre_curso.label(class="form-label") }}
+                                {{ form.nombre_curso(class="form-control") }}
+                                {% if form.nombre_curso.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.nombre_curso.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form.creditos.label(class="form-label") }}
+                                {{ form.creditos(class="form-control", type="number", min="1", max="10") }}
+                                {% if form.creditos.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.creditos.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.activo(class="form-check-input") }}
+                            {{ form.activo.label(class="form-check-label") }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('cursos.detalle', curso_id=curso.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <div>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Actualizar Curso
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Evaluación - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('evaluaciones.index') }}">Evaluaciones</a></li>
+        <li class="breadcrumb-item active">Crear Evaluación</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-clipboard-check text-primary"></i>
+                Crear Nueva Evaluación
+            </h2>
+            <a href="{{ url_for('evaluaciones.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver a la lista
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle"></i>
+                    Información de la Evaluación
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('evaluaciones.crear_evaluacion') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.curso_id.label(class="form-label") }}
+                                {{ form.curso_id(class="form-select") }}
+                                {% if form.curso_id.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.curso_id.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Seleccione el curso para esta evaluación</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.tipo_evaluacion.label(class="form-label") }}
+                                {{ form.tipo_evaluacion(class="form-select") }}
+                                {% if form.tipo_evaluacion.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.tipo_evaluacion.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                {{ form.nombre_evaluacion.label(class="form-label") }}
+                                {{ form.nombre_evaluacion(class="form-control") }}
+                                {% if form.nombre_evaluacion.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.nombre_evaluacion.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Nombre descriptivo de la evaluación (ej: Parcial 1, Quiz Unidad 2)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                {{ form.peso.label(class="form-label") }}
+                                {{ form.peso(class="form-control", type="number", step="0.1", min="0", max="100") }}
+                                {% if form.peso.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.peso.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Porcentaje que representa en la nota final</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.fecha_creacion.label(class="form-label") }}
+                                {{ form.fecha_creacion(class="form-control", type="date") }}
+                                {% if form.fecha_creacion.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.fecha_creacion.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('evaluaciones.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

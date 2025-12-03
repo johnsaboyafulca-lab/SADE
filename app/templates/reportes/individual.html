@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte Individual - Sistema de Seguimiento{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('reportes.index') }}">Reportes</a></li>
+        <li class="breadcrumb-item active">Individual</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-user-graduate text-dark"></i>
+                Reporte Individual de Riesgo
+            </h2>
+            <a href="{{ url_for('reportes.index') }}" class="btn btn-outline-primary text-light bg-cards">
+                <i class="fas fa-arrow-left "></i> Volver
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-cards2">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cog"></i>
+                    Configurar Reporte Individual
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('reportes.generar_individual') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="estudiante_id" class="form-label">Seleccionar Estudiante *</label>
+                                <select class="form-select" id="estudiante_id" name="estudiante_id" required>
+                                    <option value="">-- Seleccione un estudiante --</option>
+                                    {% for estudiante in estudiantes %}
+                                    <option value="{{ estudiante.id }}">
+                                        {{ estudiante.codigo_estudiante }} - {{ estudiante.nombres }} {{ estudiante.apellidos }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="semestre" class="form-label">Semestre</label>
+                                <input type="text" class="form-control" id="semestre" name="semestre" 
+                                       placeholder="Ej: 2025-1" value="{{ config.semestre_actual if config }}">
+                                <div class="form-text">Dejar vacío para usar el semestre actual</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="formato" class="form-label">Formato de Salida</label>
+                                <select class="form-select" id="formato" name="formato" required>
+                                    <option value="html">Vista Previa (HTML)</option>
+                                    <option value="pdf">Documento PDF</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Información:</strong> El reporte incluirá información personal, 
+                        categoría de riesgo, rendimiento académico detallado y recomendaciones específicas.
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary bg-cards">
+                            <i class="fas fa-play-circle"></i> Generar Reporte
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Estudiantes en Riesgo - SISE{% endblock %}
+{% block content %}
+   
+
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('estudiantes.index') }}">Estudiantes</a></li>
+                <li class="breadcrumb-item active">Estudiantes en Riesgo</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-dark">
+                        <span class="#"><i class="fas fa-exclamation-triangle "></i></span>
+                        Estudiantes en Riesgo Académico
+                    </h2>
+                    <a href="{{ url_for('estudiantes.index') }}" class="btn btn-primary bg-cards2">
+                        <i class="fas fa-arrow-left"></i> Volver a Estudiantes
+                    </a>
+                </div>
+
+                <!-- Alertas por categoría -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-light bg-cards3">
+                            <div class="card-body text-center">
+                                <h3 class="text-dark mb-1">
+                                    {{ estudiantes_riesgo.total }}
+                                </h3>
+                                <p class="mb-0">Total en Riesgo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de estudiantes en riesgo -->
+                <div class="card">
+                    <div class="card-header bg-cards text-light">
+                        <h5 class="card-title mb-0">
+                            Lista de Estudiantes con Alertas
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if estudiantes_riesgo.items %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-warning">
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Estudiante</th>
+                                        <th>Categoría de Riesgo</th>
+                                        <th>Puntaje</th>
+                                        <th>Última Evaluación</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for estudiante, seguimiento in estudiantes_riesgo.items %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ estudiante.codigo_estudiante }}</strong>
+                                        </td>
+                                        <td>
+                                            {{ estudiante.nombres }} {{ estudiante.apellidos }}
+                                        </td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if seguimiento.categoria_riesgo == 'ALERTA_ROJA' %}bg-danger
+                                                {% elif seguimiento.categoria_riesgo == 'ALERTA_AMARILLA' %}bg-warning
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ seguimiento.categoria_riesgo.replace('_', ' ') }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <strong>{{ "%.2f"|format(seguimiento.puntaje_riesgo) }}</strong>
+                                        </td>
+                                        <td>
+                                            {{ seguimiento.fecha_evaluacion.strftime('%d/%m/%Y') }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('estudiantes.detalle', estudiante_id=estudiante.id) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> Detalle
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h5>¡Excelentes noticias!</h5>
+                            <p class="text-muted">No hay estudiantes en riesgo académico actualmente.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Paginación -->
+                    {% if estudiantes_riesgo.pages > 1 %}
+                    <div class="card-footer">
+                        <nav aria-label="Paginación">
+                            <ul class="pagination justify-content-center mb-0">
+                                {% for page_num in estudiantes_riesgo.iter_pages() %}
+                                    {% if page_num %}
+                                        <li class="page-item {% if page_num == estudiantes_riesgo.page %}active{% endif %}">
+                                            <a class="page-link" 
+                                               href="{{ url_for('estudiantes.en_riesgo', page=page_num) }}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

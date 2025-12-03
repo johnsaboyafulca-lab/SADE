@@ -1,88 +1,306 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{%block title%}{%endblock%}</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}Sistema Analitico Desempeño Estudiantil{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='base/base.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard/dash.css') }}" />
+    
+    {% block styles %}{% endblock %}
 </head>
-
-<link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
-
 <body>
-<nav
-    class="navbar navbar-expand-sm navbar-light bg-light"
->
-    <div class="container">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button
-            class="navbar-toggler d-lg-none"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapsibleNavId"
-            aria-controls="collapsibleNavId"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="collapsibleNavId">
-            <ul class="navbar-nav me-auto mt-2 mt-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#" aria-current="page"
-                        >Home
-                        <span class="visually-hidden">(current)</span></a
-                    >
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a
-                        class="nav-link dropdown-toggle"
-                        href="#"
-                        id="dropdownId"
-                        data-bs-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                        >Dropdown</a
-                    >
-                    <div
-                        class="dropdown-menu"
-                        aria-labelledby="dropdownId"
-                    >
-                        <a class="dropdown-item" href="#"
-                            >Action 1</a
-                        >
-                        <a class="dropdown-item" href="#"
-                            >Action 2</a
-                        >
-                    </div>
-                </li>
-            </ul>
-            <form class="d-flex my-2 my-lg-0">
-                <input
-                    class="form-control me-sm-2"
-                    type="text"
-                    placeholder="Search"
-                />
-                <button
-                    class="btn btn-outline-success my-2 my-sm-0"
-                    type="submit"
-                >
-                    Search
-                </button>
-            </form>
+    <!-- Navbar Principal -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-azul">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('dashboard.index') }}">
+                <img class="logo_see" src="{{url_for('static', filename='img/logo_see_f.png')}}" alt="logo">
+                <span class="separador">SADES</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto">
+                    <!-- Dashboard -->
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'dashboard.index' else '' }}" 
+                           href="{{ url_for('dashboard.index') }}">
+                             Dashboard
+                        </a>
+                    </li>
+                    
+                    <!-- Estudiantes -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint and 'estudiantes' in request.endpoint else '' }}" 
+                           href="#" 
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                             Estudiantes
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item {{ 'active' if request.endpoint == 'estudiantes.index' else '' }}" 
+                                   href="{{ url_for('estudiantes.index') }}">
+                                    <i class="fas fa-list me-2"></i>Todos los Estudiantes
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ 'active' if request.endpoint == 'estudiantes.en_riesgo' else '' }}" 
+                                   href="{{ url_for('estudiantes.en_riesgo') }}">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>En Riesgo Académico
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Seguimiento -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint and 'seguimiento' in request.endpoint else '' }}" 
+                           href="#" 
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                             Seguimiento
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item {{ 'active' if request.endpoint == 'seguimiento.index' else '' }}" 
+                                   href="{{ url_for('seguimiento.index') }}">
+                                    <i class="fas fa-calculator me-2"></i>Cálculo de Riesgo
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ 'active' if request.endpoint == 'seguimiento.resultados' else '' }}" 
+                                   href="{{ url_for('seguimiento.resultados') }}">
+                                    <i class="fas fa-chart-bar me-2"></i>Resultados
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Reportes -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint and 'reportes' in request.endpoint else '' }}" 
+                           href="#" 
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                             Reportes
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item {{ 'active' if request.endpoint == 'reportes.index' else '' }}" 
+                                   href="{{ url_for('reportes.index') }}">
+                                    <i class="fas fa-home me-2"></i>Panel de Reportes
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item {{ 'active' if request.endpoint == 'reportes.individual' else '' }}" 
+                                   href="{{ url_for('reportes.individual') }}">
+                                    <i class="fas fa-user-graduate me-2"></i>Reporte Individual
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ 'active' if request.endpoint == 'reportes.general' else '' }}" 
+                                   href="{{ url_for('reportes.general') }}">
+                                    <i class="fas fa-users me-2"></i>Reporte General
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ 'active' if request.endpoint == 'reportes.historial' else '' }}" 
+                                   href="{{ url_for('reportes.historial') }}">
+                                    <i class="fas fa-history me-2"></i>Historial
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Importación -->
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint and 'importacion' in request.endpoint else '' }}" 
+                           href="{{ url_for('importacion.index') }}">
+                           Importación
+                        </a>
+                    </li>
+                    
+                    <!-- Agregar en el navbar, después del dropdown de Estudiantes -->
+<li class="nav-item">
+    <a class="nav-link {{ 'active' if request.endpoint and 'cursos' in request.endpoint else '' }}"
+       href="{{ url_for('cursos.index') }}">
+        Cursos
+    </a>
+</li>
+
+<!-- Agregar en el navbar, después del enlace de Cursos -->
+<li class="nav-item">
+    <a class="nav-link {{ 'active' if request.endpoint and 'inscripciones' in request.endpoint else '' }}"
+       href="{{ url_for('inscripciones.index') }}">
+        Inscripciones
+    </a>
+</li>
+<!-- Agregar en el navbar, después del enlace de Inscripciones -->
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint and 'evaluaciones' in request.endpoint else '' }}"
+       href="#"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+        Evaluaciones
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a class="dropdown-item {{ 'active' if request.endpoint == 'evaluaciones.index' else '' }}"
+               href="{{ url_for('evaluaciones.index') }}">
+                <i class="fas fa-clipboard-check me-2"></i>Gestión de Evaluaciones
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item {{ 'active' if request.endpoint == 'evaluaciones.notas_index' else '' }}"
+               href="{{ url_for('evaluaciones.notas_index') }}">
+                <i class="fas fa-chart-bar me-2"></i>Registro de Notas
+            </a>
+        </li>
+    </ul>
+</li>
+<!-- Agregar en el navbar, después del dropdown de Evaluaciones -->
+<li class="nav-item">
+    <a class="nav-link {{ 'active' if request.endpoint and 'asistencias' in request.endpoint else '' }}"
+       href="{{ url_for('asistencias.index') }}">
+        Asistencias
+    </a>
+</li>
+                </ul>
+
+                <!-- Lado derecho del navbar -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Administración (solo para administradores) -->
+                    {% if current_user.rol == 'administrador' %}
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint and 'admin' in request.endpoint else '' }}" 
+                           href="{{ url_for('admin.index') }}">
+                            <i class="fas fa-cogs me-1"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Usuario -->
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-user me-1"></i> 
+                            
+                        </span>
+                    </li>
+
+
+                    <!-- Logout -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Salir
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
+    <!-- Contenido Principal -->
+    <main class="container mt-4">
+        <!-- Mensajes Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    {%block content %}
+        <!-- Breadcrumb -->
+        {% block breadcrumb %}{% endblock %}
+        
+        <!-- Contenido específico de cada página -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light mt-5 py-4">
+        <div class="container text-center text-muted">
+            <small>Sistema Analitico de Desempeño Estudiantil &copy; 2025</small>
+            <!-- <small>Sistema de Seguimiento y Acompañamiento para Estudiantes en Riesgo &copy; 2024</small> -->
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- JavaScript PERSONALIZADO PARA DROPDOWNS FUNCIONALES -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Inicializando dropdowns personalizados...');
+        
+        // Manejar todos los dropdowns del navbar
+        const dropdownToggles = document.querySelectorAll('.nav-item.dropdown .dropdown-toggle');
+        
+        dropdownToggles.forEach(toggle => {
+            const dropdownMenu = toggle.nextElementSibling;
+            const parentItem = toggle.parentElement;
+            
+            // Prevenir el cierre automático al hacer clic dentro del dropdown
+            dropdownMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Manejar clic en los items del dropdown
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    console.log('Navegando a:', this.href);
+                    // Permitir la navegación normal
+                    // El dropdown se cerrará automáticamente al cambiar de página
+                });
+            });
+            
+            // Alternativa: mantener dropdown abierto manualmente
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Cerrar otros dropdowns abiertos
+                document.querySelectorAll('.nav-item.dropdown .dropdown-menu').forEach(menu => {
+                    if (menu !== dropdownMenu && menu.classList.contains('show')) {
+                        menu.classList.remove('show');
+                    }
+                });
+                
+                // Alternar el dropdown actual
+                dropdownMenu.classList.toggle('show');
+            });
+        });
+        
+        // Cerrar dropdowns al hacer clic fuera del navbar
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.nav-item.dropdown')) {
+                document.querySelectorAll('.nav-item.dropdown .dropdown-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+        
+        console.log('Dropdowns inicializados correctamente');
+    });
+    </script>
     
-    {%endblock%}
-
-
-<script src="../static/bootstrap/js/bootstrap.bundle.js"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>
